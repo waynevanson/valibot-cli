@@ -1,32 +1,32 @@
-import type {
-  BaseIssue,
-  BaseSchema,
-  MetadataAction,
-  PipeItem,
-  SchemaWithPipe,
-} from "valibot"
+export interface ArgValue {
+  type: "value"
+  name: string
+  aliases: Array<string>
+}
 
-export type ArgMetadata =
-  | {
-      type: "value"
-      name: string
-      aliases: Array<string>
-    }
-  | { type: "flag" }
-  | { type: "command" }
-  | { type: "subcommand" }
+export interface ArgFlag {
+  type: "flag"
+}
 
-export type Parsable = LeafSchema
+export interface ArgCommand {
+  type: "command"
+}
 
-export type TreeSchema = {}
+export interface ArgSubcommand {
+  type: "subcommand"
+  name: string
+}
 
-// well these are for args.
-export type LeafSchema = SchemaWithPipe<
-  readonly [
-    BaseSchema<string, unknown, BaseIssue<unknown>>,
-    ...(
-      | PipeItem<any, unknown, BaseIssue<unknown>>
-      | MetadataAction<unknown, ArgMetadata>
-    )[],
-  ]
->
+export type ArgKind = ArgValue | ArgFlag | ArgCommand | ArgSubcommand
+
+export type FindExactlyOne<
+  T extends readonly unknown[],
+  Target,
+  Count extends Target[] = []
+> = T extends [infer Head, ...infer Tail]
+  ? Head extends Target
+    ? FindExactlyOne<Tail, Target, [...Count, Head]>
+    : FindExactlyOne<Tail, Target, Count>
+  : Count["length"] extends 1
+    ? Count[0]
+    : never
