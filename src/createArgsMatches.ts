@@ -1,25 +1,6 @@
-import {
-  ArrayIssue,
-  ArraySchema,
-  BaseIssue,
-  BaseSchema,
-  BaseValidation,
-  ErrorMessage,
-  ExactOptionalSchema,
-  LooseObjectIssue,
-  LooseObjectSchema,
-  ObjectEntries,
-  ObjectIssue,
-  ObjectSchema,
-  PipeItem,
-  SchemaWithPipe,
-  StrictObjectIssue,
-  StrictObjectSchema
-} from "valibot"
 import * as v from "valibot"
-import { INTERNAL } from "./actions"
-import { ArgCommand, ArgKind, FindExactlyOne } from "./types"
-import { behead } from "./utils"
+import { ArgMethod, INTERNAL } from "./actions/arg"
+import { ArgFlag, ArgKind, ArgValue } from "./types"
 
 export interface ArgsMatches {
   args: {
@@ -35,27 +16,11 @@ export interface Subcommand {
   matches: ArgsMatches
 }
 
-export type CommandableSchemaKind = v.SchemaWithPipe<
-  readonly [v.StringSchema<v.ErrorMessage<v.StringIssue>>]
+export type CommandableSchemaKind = ArgMethod<
+  | v.StringSchema<v.ErrorMessage<v.StringIssue>>
+  | v.NumberSchema<v.ErrorMessage<v.NumberIssue>>,
+  ArgValue | ArgFlag
 >
-
-export type Container =
-  | ArraySchema<
-      BaseSchema<unknown, unknown, BaseIssue<unknown>>,
-      ErrorMessage<ArrayIssue> | undefined
-    >
-  | LooseObjectSchema<ObjectEntries, ErrorMessage<LooseObjectIssue> | undefined>
-  | ObjectSchema<ObjectEntries, ErrorMessage<ObjectIssue> | undefined>
-  | StrictObjectSchema<
-      ObjectEntries,
-      ErrorMessage<StrictObjectIssue> | undefined
-    >
-  | SchemaWithPipe<
-      [
-        BaseSchema<unknown, unknown, BaseIssue<unknown>>,
-        ...PipeItem<unknown, unknown, v.BaseIssue<unknown>>[]
-      ]
-    >
 
 // arg groups are structures with all leaf values
 // let's build a structure that can use the schema to check what can be matched.
@@ -67,17 +32,28 @@ export type Container =
 export function createArgsMatches<const TSchema extends CommandableSchemaKind>(
   schema: TSchema
 ) {
-  let args: Array<string> = []
-
-  // check if top is leaf: value or flag
+  const args: Array<ArgKind> = []
 
   switch (schema.type) {
-    case "string": {
+    case "string":
+    case "number":
+      const kind = schema.pipe[1].metadata[INTERNAL]
+      args.push(kind)
       break
-    }
   }
 
   return {
-    args
+    // When we pull a value, we check that we can pull it.
+    get(cfg: string) {
+      const arg = args.find(
+        (arg) => arg.type === "value" || arg.type === "flag"
+      )
+
+      switch (arg?.type) {
+        case "value": {
+          return cfg === arg.name || arg.aliases.includes(cfg) ? arg : undefined
+        }
+      }
+    }
   }
 }
