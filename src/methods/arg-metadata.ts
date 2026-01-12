@@ -3,6 +3,8 @@ export interface ArgValueMetadata {
   name: string
 }
 
+// default, schema, multiple, required
+// required and default are the same?
 export interface ArgOptionMetadata {
   type: "option"
   name: string

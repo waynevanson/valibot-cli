@@ -1,39 +1,39 @@
 import * as v from "valibot"
-import { objectWithoutRestUndefined } from "./schema"
-import { tuple } from "./utils"
+import { objectWithoutRestUndefined } from "../schema"
+import { tuple } from "../utils"
 
-export type ArgToken = FlagToken | PrevaluesToken | ValueToken
-export type ArgsToken = FlagToken | ValueToken
+export type ArgToken = OptionToken | PrevaluesToken | ValueToken
+export type ArgsToken = OptionToken | ValueToken
 
-export type FlagToken =
-  | FlagLongValueToken
-  | FlagLongToken
-  | FlagShortValueToken
-  | FlagShortToken
+export type OptionToken =
+  | OptionLongValueToken
+  | OptionLongToken
+  | OptionsShortValueToken
+  | OptionShortToken
 
-export type FlagLongValueToken = {
-  type: "flag"
+export type OptionLongValueToken = {
+  type: "option"
   short: false
   identifier: string
   value: string
 }
 
-export type FlagLongToken = {
-  type: "flag"
+export type OptionLongToken = {
+  type: "option"
   short: false
   identifier: string
   value: undefined
 }
 
-export type FlagShortValueToken = {
-  type: "flag"
+export type OptionsShortValueToken = {
+  type: "option"
   identifier: string
   value: string
   short: true
 }
 
-export type FlagShortToken = {
-  type: "flag"
+export type OptionShortToken = {
+  type: "option"
   identifier: string
   short: true
   value: undefined
@@ -58,10 +58,10 @@ const longs = v.pipe(
     identifier: v.string(),
     value: v.optional(v.string())
   }),
-  v.transform((input): FlagLongToken | FlagLongValueToken => ({
+  v.transform((input): OptionLongToken | OptionLongValueToken => ({
     identifier: input.identifier,
     short: false,
-    type: "flag",
+    type: "option",
     value: input.value
   })),
   v.transform(tuple)
@@ -79,11 +79,11 @@ const shorts = v.pipe(
     const identifiers = Array.from(input.identifiers)
 
     const starts = identifiers.slice(0, -1)
-    const tokens: Array<FlagShortToken | FlagShortValueToken> = starts.map(
+    const tokens: Array<OptionShortToken | OptionsShortValueToken> = starts.map(
       (identifier) => ({
         identifier,
         short: true,
-        type: "flag",
+        type: "option",
         value: undefined
       })
     )
@@ -92,7 +92,7 @@ const shorts = v.pipe(
       tokens.push({
         identifier: identifiers[identifiers.length - 1],
         short: true,
-        type: "flag",
+        type: "option",
         value: input.value
       })
     }
@@ -157,14 +157,14 @@ function saturate(state: State): State {
   }
 }
 
-export function createArgsTokens(args: Array<string>): Array<ArgToken> {
+export function createArgsTokens(args: Array<string>): Array<ArgsToken> {
   let state: State = State.Normal
 
-  const results: Array<ArgToken> = []
+  const argsToken: Array<ArgsToken> = []
 
   for (const arg of args) {
     if (state > State.Normal) {
-      results.push({ type: "value", value: arg })
+      argsToken.push({ type: "value", value: arg })
       state = saturate(state)
     }
 
@@ -176,7 +176,7 @@ export function createArgsTokens(args: Array<string>): Array<ArgToken> {
         }
 
         default: {
-          results.push(argToken)
+          argsToken.push(argToken)
           break
         }
       }
@@ -187,5 +187,5 @@ export function createArgsTokens(args: Array<string>): Array<ArgToken> {
     throw new Error("Expected to emit value arg after providing `--`")
   }
 
-  return results
+  return argsToken
 }

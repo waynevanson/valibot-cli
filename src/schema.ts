@@ -1,4 +1,5 @@
 import * as v from "valibot"
+import { filterObject } from "./utils"
 
 export function objectWithoutRestUndefined<
   const Entries extends v.ObjectEntries
@@ -40,14 +41,4 @@ export function unpipe<
 
   //@ts-expect-error
   return schema_
-}
-
-export function filterObject<T extends object>(
-  input: T
-): {
-  [P in keyof T as {} extends Pick<T, P> ? never : P]: T[P]
-} {
-  return Object.fromEntries(
-    Object.entries(input).filter(([property, value]) => value !== undefined)
-  ) as never
 }
