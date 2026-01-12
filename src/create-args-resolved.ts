@@ -1,6 +1,6 @@
 import * as v from "valibot"
 import { ArgMatch } from "./create-arg-matches"
-import { ArgToken } from "./tokens/createArgsToken"
+import { ArgToken } from "./tokens"
 
 // values that are from args
 export type ArgsResolved = Array<{ id: symbol; value: string }>
@@ -20,19 +20,22 @@ export function createArgsResolved(
     // pull in a match
 
     switch (token.type) {
-      case "long-with-value": {
-        const match = matches.find(
-          (match) =>
-            (match.type === "flag" && match.longs.includes(token.identifier)) ||
-            (match.type === "flag-with-value" &&
-              match.longs.includes(token.identifier))
-        )
+      case "flag": {
+        if (token.short === false) {
+          const match = matches.find(
+            (match) =>
+              (match.type === "flag" &&
+                match.longs.includes(token.identifier)) ||
+              (match.type === "flag-with-value" &&
+                match.longs.includes(token.identifier))
+          )
 
-        if (match === undefined) {
-          throw new Error("Cannot find a long match")
+          if (match === undefined) {
+            throw new Error("Cannot find a long match")
+          }
+
+          resolved.push({ id: match.id, value: token.value ?? "" })
         }
-
-        resolved.push({ id: match.id, value: token.value ?? "" })
       }
     }
   }

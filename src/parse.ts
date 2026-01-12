@@ -31,7 +31,8 @@ export function parse<TSchema extends ParsableSchema>(
       break
     case "variant":
       break
-
+    case "boolean":
+      break
     default:
       const _: never = schema
   }

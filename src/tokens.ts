@@ -149,6 +149,14 @@ export const State = {
 
 export type State = (typeof State)[keyof typeof State]
 
+function saturate(state: State): State {
+  if (state === State.Normal) {
+    return State.Set
+  } else {
+    return State.Wired
+  }
+}
+
 export function createArgsTokens(args: Array<string>): Array<ArgToken> {
   let state: State = State.Normal
 
@@ -157,13 +165,13 @@ export function createArgsTokens(args: Array<string>): Array<ArgToken> {
   for (const arg of args) {
     if (state > State.Normal) {
       results.push({ type: "value", value: arg })
-      state = State.Wired
+      state = saturate(state)
     }
 
     for (const argToken of createArgTokens(arg)) {
       switch (argToken.type) {
         case "prevalues": {
-          state = State.Set
+          state = saturate(state)
           break
         }
 
