@@ -1,8 +1,8 @@
 import * as v from "valibot"
-import { ArgValue } from "../types"
+import { ArgFlagMetadata } from "./arg-metadata"
 import { arg } from "./arg"
 
-export type ValueSchema =
+export type FlagSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   | v.BlobSchema<v.ErrorMessage<v.BlobIssue> | undefined>
   | v.BigintSchema<v.ErrorMessage<v.BigintIssue> | undefined>
@@ -18,9 +18,9 @@ export type ValueSchema =
     >
   | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
 
-export function value<TSchema extends ValueSchema>(
+export function flag<TSchema extends FlagSchema>(
   schema: TSchema,
-  value: ArgValue
+  flag: ArgFlagMetadata
 ) {
-  return arg(schema, value)
+  return arg(schema, flag)
 }

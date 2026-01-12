@@ -1,5 +1,5 @@
 import * as v from "valibot"
-import { ArgSubcommand } from "../types"
+import { ArgSubcommandMetadata } from "./arg-metadata"
 import { arg } from "./arg"
 
 export type Subcommand =
@@ -35,7 +35,7 @@ export type Subcommand =
 // todo: use variants or ensure a singleone
 export function subcommand<TSchema extends Subcommand>(
   schema: TSchema,
-  subcommand: ArgSubcommand
+  subcommand: ArgSubcommandMetadata
 ) {
   return arg(schema, subcommand)
 }

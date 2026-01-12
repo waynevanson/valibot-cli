@@ -1,24 +1,3 @@
-export interface ArgValue {
-  type: "value"
-  name: string
-  aliases: Array<string>
-}
-
-export interface ArgFlag {
-  type: "flag"
-}
-
-export interface ArgCommand {
-  type: "command"
-}
-
-export interface ArgSubcommand {
-  type: "subcommand"
-  name: string
-}
-
-export type ArgKind = ArgValue | ArgFlag | ArgCommand | ArgSubcommand
-
 export type FindExactlyOne<
   T extends readonly unknown[],
   Target,
