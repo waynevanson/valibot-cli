@@ -1,16 +1,19 @@
 import * as v from "valibot"
 
-export function objectWithoutUndefined<
-  const TEntries$1 extends v.ObjectEntries
->(entries: TEntries$1) {
-  return objectWithoutRest(entries, v.undefined())
-}
-
-export function objectWithoutRest<
-  const TEntries$1 extends v.ObjectEntries,
-  const TRest$1 extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>
->(entries: TEntries$1, rest: TRest$1) {
-  return v.pipe(v.objectWithRest(entries, rest), v.object(entries))
+export function objectWithoutRestUndefined<
+  const Entries extends v.ObjectEntries
+>(entries: Entries) {
+  return v.pipe(
+    v.objectWithRest(entries, v.undefined()),
+    v.transform(
+      (
+        input
+      ): {
+        [P in keyof Entries]: v.InferOutput<Entries[P]>
+      } => filterObject(input) as never
+    ),
+    v.object(entries)
+  )
 }
 
 export type UnPipe<
@@ -37,4 +40,14 @@ export function unpipe<
 
   //@ts-expect-error
   return schema_
+}
+
+export function filterObject<T extends object>(
+  input: T
+): {
+  [P in keyof T as {} extends Pick<T, P> ? never : P]: T[P]
+} {
+  return Object.fromEntries(
+    Object.entries(input).filter(([property, value]) => value !== undefined)
+  ) as never
 }
