@@ -1,5 +1,11 @@
 import * as v from "valibot"
-export type ArgToken = Exclude<RawArgToken, { type: "double" }>
+
+export type ArgToken = {
+  type: "long-with-value"
+  identifier: string
+  value: string
+}
+
 export type ArgTokens = Array<ArgToken>
 
 /**
@@ -27,7 +33,7 @@ export function createArgsTokens(args: Array<string>): Array<ArgToken> {
     )
 
     results.push({
-      type: "long",
+      type: "long-with-value",
       identifier: groups.identifier,
       value: groups.value
     })
@@ -38,4 +44,23 @@ export function createArgsTokens(args: Array<string>): Array<ArgToken> {
   }
 
   return results
+}
+
+const LONG_FLAG_WITH_VALUE_REGEXP = /^--(?<identifier>[^=]+)(=(?<value>.+))$/
+
+const LongFlagWithValueGroups = v.strictObject({
+  identifier: v.string(),
+  value: v.string()
+})
+
+export function isLongFlagWithValue(arg: string) {
+  const matches = LONG_FLAG_WITH_VALUE_REGEXP.exec(arg)
+
+  if (matches === null) {
+    return undefined
+  }
+
+  const groups = v.parse(LongFlagWithValueGroups, matches.groups)
+
+  return { ...groups, type: "long" }
 }

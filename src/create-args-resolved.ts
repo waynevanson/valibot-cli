@@ -1,7 +1,6 @@
-import { symbol } from "valibot"
+import * as v from "valibot"
 import { ArgMatch } from "./create-arg-matches"
 import { ArgToken } from "./tokens/createArgsToken"
-import { unpipe } from "./schema"
 
 // values that are from args
 export type ArgsResolved = Array<{ id: symbol; value: string }>
@@ -21,7 +20,7 @@ export function createArgsResolved(
     // pull in a match
 
     switch (token.type) {
-      case "long": {
+      case "long-with-value": {
         const match = matches.find(
           (match) =>
             (match.type === "flag" && match.longs.includes(token.identifier)) ||
@@ -34,10 +33,6 @@ export function createArgsResolved(
         }
 
         resolved.push({ id: match.id, value: token.value ?? "" })
-      }
-      case "short": {
-      }
-      case "value": {
       }
     }
   }
