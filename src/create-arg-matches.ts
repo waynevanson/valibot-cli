@@ -1,10 +1,10 @@
 import * as v from "valibot"
 import {
-  ArgFlagMetadata,
+  ArgOptionMetadata,
   ArgMetadata,
   ArgSubcommandMetadata,
   ArgValueMetadata,
-  isArgFlagMetadata,
+  isArgOptionMetadata,
   isArgSubcommandMetadata
 } from "./methods"
 import { ArgMethod, getArgMethodMetadata, isArgMethod } from "./methods/arg"
@@ -31,7 +31,7 @@ export interface ArgMatchBase {
 export type ArgMatch = ArgFlagMatch | ArgValueMatch | ArgFlagValueMatch
 
 export type ArgFlagValueMatch = ArgMatchBase &
-  Omit<ArgFlagMetadata, "type"> & {
+  Omit<ArgOptionMetadata, "type"> & {
     type: "flag-with-value"
     optional: boolean
     omittable: boolean
@@ -39,7 +39,7 @@ export type ArgFlagValueMatch = ArgMatchBase &
   }
 
 export type ArgFlagMatch = ArgMatchBase &
-  ArgFlagMetadata & {
+  ArgOptionMetadata & {
     schema: v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>
     optional: boolean
     default?: unknown
@@ -63,7 +63,7 @@ export type ParsableSchema =
       | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
       | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
       | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
-      ArgValueMetadata | ArgFlagMetadata
+      ArgValueMetadata | ArgOptionMetadata
     >
   | v.StrictObjectSchema<v.ObjectEntries, v.ErrorMessage<v.StrictObjectIssue>>
   | v.VariantSchema<
@@ -102,7 +102,7 @@ export function createArgMatches<const TSchema extends ParsableSchema>(
             if (isArgMethod(entry)) {
               const argMetadata = getArgMethodMetadata(entry)
 
-              if (!isArgFlagMetadata(argMetadata)) {
+              if (!isArgOptionMetadata(argMetadata)) {
                 throw new Error("Expected not to be a subcommand")
               }
 

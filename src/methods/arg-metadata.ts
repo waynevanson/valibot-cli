@@ -3,8 +3,8 @@ export interface ArgValueMetadata {
   name: string
 }
 
-export interface ArgFlagMetadata {
-  type: "flag"
+export interface ArgOptionMetadata {
+  type: "option"
   name: string
   longs: Array<string>
   shorts: Array<string>
@@ -17,7 +17,7 @@ export interface ArgSubcommandMetadata {
 
 export type ArgMetadata =
   | ArgValueMetadata
-  | ArgFlagMetadata
+  | ArgOptionMetadata
   | ArgSubcommandMetadata
 
 export function isArgValueMetadata(
@@ -26,10 +26,10 @@ export function isArgValueMetadata(
   return value.type === "value"
 }
 
-export function isArgFlagMetadata(
+export function isArgOptionMetadata(
   value: ArgMetadata
-): value is ArgFlagMetadata {
-  return value.type === "flag"
+): value is ArgOptionMetadata {
+  return value.type === "option"
 }
 
 export function isArgSubcommandMetadata(
