@@ -5,6 +5,7 @@ export interface ArgValueMetadata {
 
 export interface ArgFlagMetadata {
   type: "flag"
+  name: string
   longs: Array<string>
   shorts: Array<string>
 }

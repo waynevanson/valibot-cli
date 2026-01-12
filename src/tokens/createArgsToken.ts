@@ -1,5 +1,4 @@
-import { createRawArgTokens, RawArgToken } from "./createRawArgTokens"
-
+import * as v from "valibot"
 export type ArgToken = Exclude<RawArgToken, { type: "double" }>
 export type ArgTokens = Array<ArgToken>
 
@@ -16,24 +15,22 @@ export function createArgsTokens(args: Array<string>): Array<ArgToken> {
   const results: Array<ArgToken> = []
 
   for (const arg of args) {
-    if (valuesOnly) {
-      results.push({ type: "value" as const, value: arg })
-      valuesOnlyEmitted = true
-      continue
+    const matches = /^--(?<identifier>[^=]+)(=(?<value>.+))$/.exec(arg)
+
+    if (matches === null) {
+      throw new Error("Expected to find a match")
     }
 
-    // kind of hides a bit to much away
-    for (const token of createRawArgTokens(arg)) {
-      switch (token.type) {
-        case "double": {
-          valuesOnly = true
-          continue
-        }
-        default: {
-          results.push(token)
-        }
-      }
-    }
+    const groups = v.parse(
+      v.strictObject({ identifier: v.string(), value: v.string() }),
+      matches.groups
+    )
+
+    results.push({
+      type: "long",
+      identifier: groups.identifier,
+      value: groups.value
+    })
   }
 
   if (valuesOnly && !valuesOnlyEmitted) {

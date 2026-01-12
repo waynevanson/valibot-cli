@@ -58,10 +58,11 @@ export type ArgSubcommandMatch = ArgMatchBase &
     optional: boolean
   }
 
-export type CommandableSchemaKind =
+export type ParsableSchema =
   | ArgMethod<
-      | v.StringSchema<v.ErrorMessage<v.StringIssue>>
-      | v.NumberSchema<v.ErrorMessage<v.NumberIssue>>,
+      | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+      | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
+      | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
       ArgValueMetadata | ArgFlagMetadata
     >
   | v.StrictObjectSchema<v.ObjectEntries, v.ErrorMessage<v.StrictObjectIssue>>
@@ -78,7 +79,7 @@ export type CommandableSchemaKind =
 // top level should be a command
 // containing variants for subcommands
 // command/subcommand leafs of inputs should be args
-export function createArgMatches<const TSchema extends CommandableSchemaKind>(
+export function createArgMatches<const TSchema extends ParsableSchema>(
   schema: TSchema
 ) {
   const matches: Array<ArgMatch> = []

@@ -1,11 +1,10 @@
 import { createArgsResolved } from "./create-args-resolved"
-import { CommandableSchemaKind, createArgMatches } from "./create-arg-matches"
+import { ParsableSchema, createArgMatches } from "./create-arg-matches"
 import { createArgsTokens } from "./tokens"
-import { resolve } from "path"
 import * as v from "valibot"
 
 // Build the input value based on the schema and CLI args
-export function createInput<TSchema extends CommandableSchemaKind>(
+export function parse<TSchema extends ParsableSchema>(
   schema: TSchema,
   args: Array<string>
 ): v.InferInput<TSchema> {

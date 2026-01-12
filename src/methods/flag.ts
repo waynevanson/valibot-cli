@@ -5,6 +5,7 @@ import { arg } from "./arg"
 export type FlagSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   | v.BlobSchema<v.ErrorMessage<v.BlobIssue> | undefined>
+  | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>
   | v.BigintSchema<v.ErrorMessage<v.BigintIssue> | undefined>
   | v.CustomSchema<string, v.ErrorMessage<v.CustomIssue> | undefined>
   | v.DateSchema<v.ErrorMessage<v.DateIssue> | undefined>
