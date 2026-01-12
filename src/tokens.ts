@@ -96,7 +96,6 @@ const shorts = v.pipe(
         value: input.value
       })
     }
-    valu
 
     return tokens
   })
