@@ -126,8 +126,6 @@ export function parse<TSchema extends ParsableSchema>(
   }
 }
 
-function coerceFromString() {}
-
 // add a predicate
 export function findSchema<TSchema extends ParsableSchema>(schema: TSchema) {
   return schema
