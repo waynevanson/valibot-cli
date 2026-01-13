@@ -91,16 +91,9 @@ export function parse<TSchema extends ParsableSchema>(
         throw new Error()
       }
 
-      const match = findOnlyOne(
-        matches.args,
-        (value) => value.name === metadata.name
-      )
+      const all = matches.args.filter((value) => value.name === metadata.name)
 
-      if (match === undefined) {
-        return []
-      }
-
-      return [match.value]
+      return all.map((item) => item.value)
     }
     default: {
       throw new Error()
