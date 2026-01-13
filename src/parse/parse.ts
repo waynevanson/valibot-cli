@@ -5,25 +5,12 @@ import {
   getArgMethodMetadata,
   isArgOptionMetadata
 } from "../methods"
-import { ArgTokens, createArgsTokens } from "./arg-token"
 import { findExactlyOne } from "../utils"
+import { createArgsTokens } from "./arg-token"
+import { createMatches, Matches } from "./matches"
 
 // at the start we allow all args
 // but we eventually it gets narrowed down
-export type Args = Array<{
-  name: string
-  value: string
-}>
-
-export interface Matches {
-  args: Args
-  subcommand:
-    | undefined
-    | {
-        name: string
-        matches: Matches
-      }
-}
 
 function stringify(type: ParsablePrimitiveSchema["type"], value: string) {
   switch (type) {
@@ -49,37 +36,6 @@ export type ParsableSchema = ArgMethod<
   ParsablePrimitiveSchema | ParsableContainerSchema,
   ArgOptionMetadata
 >
-
-export function createMatches<TSchema extends ParsableSchema>(
-  schema: TSchema,
-  tokens: ArgTokens
-): Matches {
-  const matches: Matches = { args: [], subcommand: undefined }
-
-  for (const token of tokens) {
-    switch (token.type) {
-      case "option": {
-        if (token.value === undefined) {
-          throw new Error()
-        }
-
-        const metadata = getArgMethodMetadata(schema)
-
-        if (!isArgOptionMetadata(metadata)) {
-          throw new Error()
-        }
-
-        matches.args.push({ name: metadata.name, value: token.value })
-
-        break
-      }
-      default:
-        throw new Error()
-    }
-  }
-
-  return matches
-}
 
 export function parse<TSchema extends ParsableSchema>(
   schema: TSchema,

@@ -110,4 +110,17 @@ describe(parse, () => {
     const output = v.parse(schema, input)
     expect(output).toStrictEqual([3, 5])
   })
+
+  test("long flag option into value", () => {
+    const schema = option(v.string(), {
+      type: "option",
+      name: "greeting",
+      longs: ["greeting"],
+      shorts: []
+    })
+    const args = ["--greeting", "hello"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual("hello")
+  })
 })
