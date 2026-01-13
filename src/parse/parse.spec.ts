@@ -4,7 +4,7 @@ import * as v from "valibot"
 import { option } from "../methods"
 
 describe(parse, () => {
-  test("flag", () => {
+  test("flag string", () => {
     const schema = option(v.string(), {
       type: "option",
       name: "greeting",
@@ -15,6 +15,19 @@ describe(parse, () => {
     const input = parse(schema, args)
     const output = v.parse(schema, input)
     expect(output).toBe("hello")
+  })
+
+  test("flag number", () => {
+    const schema = option(v.number(), {
+      type: "option",
+      name: "greeting",
+      longs: ["greeting"],
+      shorts: []
+    })
+    const args = ["--greeting=3"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toBe(3)
   })
 
   test("multiple flag 0", () => {

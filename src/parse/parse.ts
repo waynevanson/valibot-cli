@@ -26,6 +26,7 @@ export interface Matches {
 
 export type ParsableSchema = ArgMethod<
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+  | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
   | v.ArraySchema<
       v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
       v.ErrorMessage<v.ArrayIssue> | undefined
@@ -83,6 +84,24 @@ export function parse<TSchema extends ParsableSchema>(
       }
 
       return match.value
+    }
+    case "number": {
+      const metadata = getArgMethodMetadata(schema)
+
+      if (!isArgOptionMetadata(metadata)) {
+        throw new Error()
+      }
+
+      const match = findOnlyOne(
+        matches.args,
+        (value) => value.name === metadata.name
+      )
+
+      if (match === undefined) {
+        throw new Error()
+      }
+
+      return Number(match.value)
     }
     case "array": {
       const metadata = getArgMethodMetadata(schema)
