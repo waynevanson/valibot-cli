@@ -2,7 +2,6 @@ import * as v from "valibot"
 import {
   ArgMethod,
   ArgOptionMetadata,
-  ArgValueMetadata,
   getArgMethodMetadata,
   isArgOptionMetadata
 } from "../methods"
@@ -26,8 +25,12 @@ export interface Matches {
 }
 
 export type ParsableSchema = ArgMethod<
-  v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
-  ArgValueMetadata | ArgOptionMetadata
+  | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+  | v.ArraySchema<
+      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+      v.ErrorMessage<v.ArrayIssue> | undefined
+    >,
+  ArgOptionMetadata
 >
 
 export function parse<TSchema extends ParsableSchema>(
@@ -70,27 +73,34 @@ export function parse<TSchema extends ParsableSchema>(
         throw new Error()
       }
 
-      let multiple = false
-      let value: undefined | string = undefined
-      for (const match of matches.args) {
-        if (match.name === metadata.name) {
-          if (value !== undefined) {
-            multiple = true
-          }
-          value = match.value
-        }
-      }
+      const match = findOnlyOne(
+        matches.args,
+        (value) => value.name === metadata.name
+      )
 
-      if (value === undefined) {
+      if (match === undefined) {
         throw new Error()
       }
 
-      if (multiple) {
+      return match.value
+    }
+    case "array": {
+      const metadata = getArgMethodMetadata(schema)
+
+      if (!isArgOptionMetadata(metadata)) {
         throw new Error()
       }
 
-      return value
-      break
+      const match = findOnlyOne(
+        matches.args,
+        (value) => value.name === metadata.name
+      )
+
+      if (match === undefined) {
+        throw new Error()
+      }
+
+      return [match.value]
     }
     default: {
       throw new Error()
@@ -101,4 +111,26 @@ export function parse<TSchema extends ParsableSchema>(
 // add a predicate
 export function findSchema<TSchema extends ParsableSchema>(schema: TSchema) {
   return schema
+}
+
+function findOnlyOne<T, F extends (value: T) => boolean>(
+  array: Array<T>,
+  predicate: F
+): T | undefined {
+  let multiple = false
+  let value: undefined | T = undefined
+  for (const item of array) {
+    if (predicate(item)) {
+      if (value !== undefined) {
+        multiple = true
+      }
+      value = item
+    }
+  }
+
+  if (multiple) {
+    throw new Error()
+  }
+
+  return value
 }

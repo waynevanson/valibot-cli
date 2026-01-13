@@ -8,7 +8,10 @@ export type ArgMethod<
   TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
   T extends ArgMetadata
 > = v.SchemaWithPipe<
-  readonly [TSchema, v.MetadataAction<string, { [INTERNAL]: T }>]
+  readonly [
+    TSchema,
+    v.MetadataAction<v.InferOutput<TSchema>, { [INTERNAL]: T }>
+  ]
 >
 
 export function arg<
