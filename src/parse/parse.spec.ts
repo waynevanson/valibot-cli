@@ -149,4 +149,25 @@ describe(parse, () => {
     const output = v.parse(schema, input)
     expect(output).toStrictEqual(["hello", "world"])
   })
+
+  test("tuple options", () => {
+    const schema = v.strictTuple([
+      option(v.string(), {
+        type: "option",
+        name: "greeting",
+        longs: ["greeting"],
+        shorts: ["g"]
+      }),
+      option(v.string(), {
+        type: "option",
+        name: "name",
+        longs: ["name"],
+        shorts: ["n"]
+      })
+    ])
+    const args = ["--greeting=hello", "--name=world"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual(["hello", "world"])
+  })
 })

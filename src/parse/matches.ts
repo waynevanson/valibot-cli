@@ -17,6 +17,30 @@ export interface Matches {
       }
 }
 
+export function findArgMethodMetadataByName<TSchema extends ParsableSchema>(
+  schema: TSchema,
+  options: { short: boolean; name: string }
+) {
+  switch (schema.type) {
+    case "array":
+    case "number":
+    case "string":
+      return getArgMethodMetadata(schema)
+    case "strict_tuple":
+      for (const item of schema.items) {
+        const metadata = getArgMethodMetadata(item)
+        const values = options.short ? metadata.shorts : metadata.longs
+        if (values.includes(options.name)) {
+          return metadata
+        }
+      }
+      throw new Error()
+    default: {
+      throw new Error()
+    }
+  }
+}
+
 export function createMatches<TSchema extends ParsableSchema>(
   schema: TSchema,
   tokens: ArgTokens
@@ -28,7 +52,10 @@ export function createMatches<TSchema extends ParsableSchema>(
   for (const token of tokens) {
     switch (token.type) {
       case "option": {
-        const metadata = getArgMethodMetadata(schema)
+        const metadata = findArgMethodMetadataByName(schema, {
+          short: token.short,
+          name: token.identifier
+        })
 
         if (!isArgOptionMetadata(metadata)) {
           throw new Error()
@@ -47,7 +74,10 @@ export function createMatches<TSchema extends ParsableSchema>(
           throw new Error()
         }
 
-        const metadata = getArgMethodMetadata(schema)
+        const metadata = findArgMethodMetadataByName(schema, {
+          short: token.short,
+          name: token.identifier
+        })
 
         if (!isArgOptionMetadata(metadata)) {
           throw new Error()
