@@ -97,7 +97,7 @@ export function parse<TSchema extends ParsableSchema>(
       )
 
       if (match === undefined) {
-        throw new Error()
+        return []
       }
 
       return [match.value]

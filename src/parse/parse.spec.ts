@@ -17,7 +17,21 @@ describe(parse, () => {
     expect(output).toBe("hello")
   })
 
-  test("multiple flag", () => {
+  test.only("multiple flag 0", () => {
+    // infinite for now
+    const schema = option(v.array(v.string()), {
+      type: "option",
+      name: "greeting",
+      longs: ["greeting"],
+      shorts: []
+    })
+    const args: Array<string> = []
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual([])
+  })
+
+  test("multiple flag 1", () => {
     // infinite for now
     const schema = option(v.array(v.string()), {
       type: "option",
