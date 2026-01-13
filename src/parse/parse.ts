@@ -68,24 +68,7 @@ export function parse<TSchema extends ParsableSchema>(
   // build data here
 
   switch (schema.type) {
-    case "string": {
-      const metadata = getArgMethodMetadata(schema)
-
-      if (!isArgOptionMetadata(metadata)) {
-        throw new Error()
-      }
-
-      const match = findOnlyOne(
-        matches.args,
-        (value) => value.name === metadata.name
-      )
-
-      if (match === undefined) {
-        throw new Error()
-      }
-
-      return match.value
-    }
+    case "string":
     case "number": {
       const metadata = getArgMethodMetadata(schema)
 
@@ -102,8 +85,16 @@ export function parse<TSchema extends ParsableSchema>(
         throw new Error()
       }
 
-      return Number(match.value)
+      switch (schema.type) {
+        case "number":
+          return Number(match.value)
+        case "string":
+          return match.value
+        default:
+          throw new Error()
+      }
     }
+
     case "array": {
       // todo: why does this not self extract?
       const schema_ = schema as Extract<
