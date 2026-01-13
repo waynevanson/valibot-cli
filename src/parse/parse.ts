@@ -5,7 +5,8 @@ import {
   getArgMethodMetadata,
   isArgOptionMetadata
 } from "../methods"
-import { createArgsTokens } from "./arg-token"
+import { ArgTokens, createArgsTokens } from "./arg-token"
+import { findExactlyOne } from "../utils"
 
 // at the start we allow all args
 // but we eventually it gets narrowed down
@@ -49,18 +50,16 @@ export type ParsableSchema = ArgMethod<
   ArgOptionMetadata
 >
 
-export function parse<TSchema extends ParsableSchema>(
+export function createMatches<TSchema extends ParsableSchema>(
   schema: TSchema,
-  args: Array<string>
-): v.InferInput<TSchema> {
-  const tokens = createArgsTokens(args)
-
+  tokens: ArgTokens
+): Matches {
   const matches: Matches = { args: [], subcommand: undefined }
 
   for (const token of tokens) {
     switch (token.type) {
       case "option": {
-        if (token.short || token.value === undefined) {
+        if (token.value === undefined) {
           throw new Error()
         }
 
@@ -79,8 +78,23 @@ export function parse<TSchema extends ParsableSchema>(
     }
   }
 
-  // build data here
+  return matches
+}
 
+export function parse<TSchema extends ParsableSchema>(
+  schema: TSchema,
+  args: Array<string>
+): v.InferInput<TSchema> {
+  const tokens = createArgsTokens(args)
+  const matches = createMatches(schema, tokens)
+  const input = build(schema, matches)
+  return input
+}
+
+export function build<TSchema extends ParsableSchema>(
+  schema: TSchema,
+  matches: Matches
+): v.InferInput<TSchema> {
   switch (schema.type) {
     case "string":
     case "number": {
@@ -90,7 +104,7 @@ export function parse<TSchema extends ParsableSchema>(
         throw new Error()
       }
 
-      const match = findOnlyOne(
+      const match = findExactlyOne(
         matches.args,
         (value) => value.name === metadata.name
       )
@@ -129,26 +143,4 @@ export function parse<TSchema extends ParsableSchema>(
 // add a predicate
 export function findSchema<TSchema extends ParsableSchema>(schema: TSchema) {
   return schema
-}
-
-function findOnlyOne<T, F extends (value: T) => boolean>(
-  array: Array<T>,
-  predicate: F
-): T | undefined {
-  let multiple = false
-  let value: undefined | T = undefined
-  for (const item of array) {
-    if (predicate(item)) {
-      if (value !== undefined) {
-        multiple = true
-      }
-      value = item
-    }
-  }
-
-  if (multiple) {
-    throw new Error()
-  }
-
-  return value
 }
