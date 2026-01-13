@@ -24,6 +24,17 @@ export interface Matches {
       }
 }
 
+function stringify(type: ParsablePrimitiveSchema["type"], value: string) {
+  switch (type) {
+    case "number":
+      return Number(value)
+    case "string":
+      return value
+    default:
+      throw new Error()
+  }
+}
+
 export type ParsablePrimitiveSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
@@ -88,14 +99,7 @@ export function parse<TSchema extends ParsableSchema>(
         throw new Error()
       }
 
-      switch (schema.type) {
-        case "number":
-          return Number(match.value)
-        case "string":
-          return match.value
-        default:
-          throw new Error()
-      }
+      return stringify(schema.type, match.value)
     }
 
     case "array": {
@@ -105,7 +109,7 @@ export function parse<TSchema extends ParsableSchema>(
         ArgMethod<ParsableContainerSchema, ArgOptionMetadata>
       >
 
-      const metadata = getArgMethodMetadata(schema)
+      const metadata = getArgMethodMetadata(schema_)
 
       if (!isArgOptionMetadata(metadata)) {
         throw new Error()
@@ -113,17 +117,7 @@ export function parse<TSchema extends ParsableSchema>(
 
       return matches.args
         .filter((match) => match.name === metadata.name)
-        .map((match) => {
-          switch (schema_.item.type) {
-            case "string":
-              return match.value
-            case "number":
-              return Number(match.value)
-            default: {
-              throw new Error()
-            }
-          }
-        })
+        .map((match) => stringify(schema_.item.type, match.value))
     }
 
     default: {
