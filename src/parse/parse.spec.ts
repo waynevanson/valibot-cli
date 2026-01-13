@@ -17,6 +17,19 @@ describe(parse, () => {
     expect(output).toBe("hello")
   })
 
+  test("short flag multiple", () => {
+    const schema = option(v.array(v.string()), {
+      type: "option",
+      name: "greeting",
+      longs: [""],
+      shorts: ["g"]
+    })
+    const args = ["-g=hello", "-g=world"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual(["hello", "world"])
+  })
+
   test("flag string", () => {
     const schema = option(v.string(), {
       type: "option",
