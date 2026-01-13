@@ -24,14 +24,17 @@ export interface Matches {
       }
 }
 
-export type ParsableSchema = ArgMethod<
+export type ParsablePrimitiveSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
-  | v.ArraySchema<
-      | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
-      | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>,
-      v.ErrorMessage<v.ArrayIssue> | undefined
-    >,
+
+export type ParsableContainerSchema = v.ArraySchema<
+  ParsablePrimitiveSchema,
+  v.ErrorMessage<v.ArrayIssue> | undefined
+>
+
+export type ParsableSchema = ArgMethod<
+  ParsablePrimitiveSchema | ParsableContainerSchema,
   ArgOptionMetadata
 >
 
@@ -99,15 +102,9 @@ export function parse<TSchema extends ParsableSchema>(
       // todo: why does this not self extract?
       const schema_ = schema as Extract<
         typeof schema,
-        ArgMethod<
-          v.ArraySchema<
-            | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
-            | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>,
-            v.ErrorMessage<v.ArrayIssue> | undefined
-          >,
-          ArgOptionMetadata
-        >
+        ArgMethod<ParsableContainerSchema, ArgOptionMetadata>
       >
+
       const metadata = getArgMethodMetadata(schema)
 
       if (!isArgOptionMetadata(metadata)) {
@@ -134,6 +131,8 @@ export function parse<TSchema extends ParsableSchema>(
     }
   }
 }
+
+function coerceFromString() {}
 
 // add a predicate
 export function findSchema<TSchema extends ParsableSchema>(schema: TSchema) {
