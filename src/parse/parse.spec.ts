@@ -136,4 +136,17 @@ describe(parse, () => {
     const output = v.parse(schema, input)
     expect(output).toStrictEqual(["hello", "world"])
   })
+
+  test("mix short and long options", () => {
+    const schema = option(v.array(v.string()), {
+      type: "option",
+      name: "greeting",
+      longs: ["greeting"],
+      shorts: ["g"]
+    })
+    const args = ["--greeting", "hello", "-g", "world"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual(["hello", "world"])
+  })
 })
