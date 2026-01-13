@@ -47,7 +47,7 @@ export function createMatches<TSchema extends ParsableSchema>(
 ): Matches {
   const matches: Matches = { args: [], subcommand: undefined }
 
-  let requiresValue = false
+  let requiresValue: undefined | OptionShortToken | OptionLongToken
 
   for (const token of tokens) {
     switch (token.type) {
@@ -62,7 +62,7 @@ export function createMatches<TSchema extends ParsableSchema>(
         }
 
         if (token.value === undefined) {
-          requiresValue = true
+          requiresValue = token
         } else {
           matches.args.push({ name: metadata.name, value: token.value })
         }
@@ -75,8 +75,8 @@ export function createMatches<TSchema extends ParsableSchema>(
         }
 
         const metadata = findArgMethodMetadataByName(schema, {
-          short: token.short,
-          name: token.identifier
+          short: requiresValue.short,
+          name: requiresValue.identifier
         })
 
         if (!isArgOptionMetadata(metadata)) {
@@ -84,7 +84,7 @@ export function createMatches<TSchema extends ParsableSchema>(
         }
 
         matches.args.push({ name: metadata.name, value: token.value })
-        requiresValue = false
+        requiresValue = undefined
 
         break
       }
@@ -93,7 +93,7 @@ export function createMatches<TSchema extends ParsableSchema>(
     }
   }
 
-  if (requiresValue) {
+  if (requiresValue !== undefined) {
     throw new Error()
   }
 

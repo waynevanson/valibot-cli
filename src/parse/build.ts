@@ -77,10 +77,6 @@ export function build<TSchema extends ParsableSchema>(
         return { metadata, schema: item }
       })
 
-      if (matches.args.length !== boths.length) {
-        throw new Error()
-      }
-
       const zipped = zip(matches.args, boths)
 
       return zipped.map(([match, both]) =>
@@ -98,10 +94,12 @@ export function zip<T extends Array<unknown>, U extends Array<unknown>>(
   left: T,
   right: U
 ): Array<[T[number], U[number]]> {
-  const length = Math.min(left.length, right.length)
+  if (left.length !== right.length) {
+    throw new Error()
+  }
 
   return Array.from(
-    { length: length },
+    { length: left.length },
     (_, index) => [left[index], right[index]] as const
   )
 }
