@@ -28,7 +28,8 @@ export type ParsableSchema = ArgMethod<
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
   | v.ArraySchema<
-      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+      | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+      | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>,
       v.ErrorMessage<v.ArrayIssue> | undefined
     >,
   ArgOptionMetadata
@@ -104,16 +105,39 @@ export function parse<TSchema extends ParsableSchema>(
       return Number(match.value)
     }
     case "array": {
+      // todo: why does this not self extract?
+      const schema_ = schema as Extract<
+        typeof schema,
+        ArgMethod<
+          v.ArraySchema<
+            | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+            | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>,
+            v.ErrorMessage<v.ArrayIssue> | undefined
+          >,
+          ArgOptionMetadata
+        >
+      >
       const metadata = getArgMethodMetadata(schema)
 
       if (!isArgOptionMetadata(metadata)) {
         throw new Error()
       }
 
-      const all = matches.args.filter((value) => value.name === metadata.name)
-
-      return all.map((item) => item.value)
+      return matches.args
+        .filter((match) => match.name === metadata.name)
+        .map((match) => {
+          switch (schema_.item.type) {
+            case "string":
+              return match.value
+            case "number":
+              return Number(match.value)
+            default: {
+              throw new Error()
+            }
+          }
+        })
     }
+
     default: {
       throw new Error()
     }

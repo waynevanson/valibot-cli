@@ -17,7 +17,7 @@ export type ArgMethod<
 export function arg<
   TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
   TArgMetadata extends ArgMetadata
->(schema: TSchema, internal: TArgMetadata) {
+>(schema: TSchema, internal: TArgMetadata): ArgMethod<TSchema, TArgMetadata> {
   return v.pipe(schema, v.metadata({ [INTERNAL]: internal }))
 }
 

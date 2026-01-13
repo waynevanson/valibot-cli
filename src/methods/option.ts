@@ -6,7 +6,8 @@ export type OptionSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>
   | v.ArraySchema<
-      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+      | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+      | v.NumberSchema<v.ErrorMessage<v.NumberIssue> | undefined>,
       v.ErrorMessage<v.ArrayIssue> | undefined
     >
 

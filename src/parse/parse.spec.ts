@@ -71,4 +71,17 @@ describe(parse, () => {
     const output = v.parse(schema, input)
     expect(output).toStrictEqual(["hello", "world"])
   })
+
+  test("multiple flag number", () => {
+    const schema = option(v.array(v.number()), {
+      type: "option",
+      name: "greeting",
+      longs: ["greeting"],
+      shorts: []
+    })
+    const args = ["--greeting=3", "--greeting=5"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual([3, 5])
+  })
 })
