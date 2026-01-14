@@ -5,7 +5,7 @@ import {
   getArgMethodMetadata,
   isArgOptionMetadata
 } from "../methods"
-import { findExactlyOne } from "../utils"
+import { findExactlyOne, zip } from "../utils"
 import { Matches } from "./matches"
 import { ParsablePrimitiveSchema, ParsableSchema } from "./parse"
 
@@ -82,20 +82,6 @@ export function build<TSchema extends ParsableSchema>(
       throw new Error()
     }
   }
-}
-
-export function zip<T extends Array<unknown>, U extends Array<unknown>>(
-  left: T,
-  right: U
-): Array<[T[number], U[number]]> {
-  if (left.length !== right.length) {
-    throw new Error()
-  }
-
-  return Array.from(
-    { length: left.length },
-    (_, index) => [left[index], right[index]] as const
-  )
 }
 
 export function stringify(

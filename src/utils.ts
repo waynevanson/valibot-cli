@@ -39,3 +39,17 @@ export function findExactlyOne<T, F extends (value: T) => boolean>(
 
   return value
 }
+
+export function zip<T extends Array<unknown>, U extends Array<unknown>>(
+  left: T,
+  right: U
+): Array<[T[number], U[number]]> {
+  if (left.length !== right.length) {
+    throw new Error()
+  }
+
+  return Array.from(
+    { length: left.length },
+    (_, index) => [left[index], right[index]] as const
+  )
+}
