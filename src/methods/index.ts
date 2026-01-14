@@ -1,4 +1,4 @@
-export * from "./command"
+export * from "./subcommand"
 export * from "./option"
 export * from "./value"
 export * from "./arg"

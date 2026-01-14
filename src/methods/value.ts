@@ -13,7 +13,7 @@ export type ValueSchema =
 
 export function value<TSchema extends ValueSchema>(
   schema: TSchema,
-  value: ArgValueMetadata
+  value: Omit<ArgValueMetadata, "type">
 ) {
-  return arg(schema, value)
+  return arg(schema, { type: "value", ...value })
 }

@@ -35,7 +35,7 @@ export type Subcommand =
 // todo: use variants or ensure a singleone
 export function subcommand<TSchema extends Subcommand>(
   schema: TSchema,
-  subcommand: ArgSubcommandMetadata
+  subcommand: Omit<ArgSubcommandMetadata, "type">
 ) {
-  return arg(schema, subcommand)
+  return arg(schema, { type: "subcommand", ...subcommand })
 }

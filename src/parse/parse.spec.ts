@@ -6,7 +6,6 @@ import { option, value } from "../methods"
 describe(parse, () => {
   test("short flag single", () => {
     const schema = option(v.string(), {
-      type: "option",
       name: "greeting",
       longs: [""],
       shorts: ["g"]
@@ -19,7 +18,6 @@ describe(parse, () => {
 
   test("short flag multiple", () => {
     const schema = option(v.array(v.string()), {
-      type: "option",
       name: "greeting",
       longs: [""],
       shorts: ["g"]
@@ -32,7 +30,6 @@ describe(parse, () => {
 
   test("flag string", () => {
     const schema = option(v.string(), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -45,7 +42,6 @@ describe(parse, () => {
 
   test("flag number", () => {
     const schema = option(v.number(), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -59,7 +55,6 @@ describe(parse, () => {
   test("multiple flag 0", () => {
     // infinite for now
     const schema = option(v.array(v.string()), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -73,7 +68,6 @@ describe(parse, () => {
   test("multiple flag 1", () => {
     // infinite for now
     const schema = option(v.array(v.string()), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -87,7 +81,6 @@ describe(parse, () => {
   test("multiple flag 2", () => {
     // infinite for now
     const schema = option(v.array(v.string()), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -100,7 +93,6 @@ describe(parse, () => {
 
   test("multiple flag number", () => {
     const schema = option(v.array(v.number()), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -113,7 +105,6 @@ describe(parse, () => {
 
   test("long flag option into value", () => {
     const schema = option(v.string(), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -126,7 +117,6 @@ describe(parse, () => {
 
   test("long flags option into value", () => {
     const schema = option(v.array(v.string()), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: []
@@ -139,7 +129,6 @@ describe(parse, () => {
 
   test("mix short and long options", () => {
     const schema = option(v.array(v.string()), {
-      type: "option",
       name: "greeting",
       longs: ["greeting"],
       shorts: ["g"]
@@ -153,13 +142,11 @@ describe(parse, () => {
   test("tuple options", () => {
     const schema = v.strictTuple([
       option(v.string(), {
-        type: "option",
         name: "greeting",
         longs: ["greeting"],
         shorts: ["g"]
       }),
       option(v.string(), {
-        type: "option",
         name: "name",
         longs: ["name"],
         shorts: ["n"]
@@ -173,7 +160,6 @@ describe(parse, () => {
 
   test("value", () => {
     const schema = value(v.string(), {
-      type: "value",
       name: "greeting"
     })
     const args = ["hello"]
@@ -184,7 +170,6 @@ describe(parse, () => {
 
   test("value number", () => {
     const schema = value(v.number(), {
-      type: "value",
       name: "greeting"
     })
     const args = ["2"]
@@ -195,7 +180,6 @@ describe(parse, () => {
 
   test("values 2 strings", () => {
     const schema = value(v.array(v.string()), {
-      type: "value",
       name: "greetings"
     })
     const args = ["hello", "world"]
@@ -206,7 +190,6 @@ describe(parse, () => {
 
   test("values 2 numbers", () => {
     const schema = value(v.array(v.number()), {
-      type: "value",
       name: "greetings"
     })
     const args = ["6", "7"]

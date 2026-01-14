@@ -13,7 +13,7 @@ export type OptionSchema =
 
 export function option<const TSchema extends OptionSchema>(
   schema: TSchema,
-  flag: ArgOptionMetadata
+  option: Omit<ArgOptionMetadata, "type">
 ) {
-  return arg(schema, flag)
+  return arg(schema, { type: "option", ...option })
 }
