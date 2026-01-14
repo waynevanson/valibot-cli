@@ -19,11 +19,7 @@ export type ParsableContainerSchema = v.ArraySchema<
 export type ParsableSchema =
   | ArgMethod<
       ParsablePrimitiveSchema | ParsableContainerSchema,
-      ArgOptionMetadata
-    >
-  | ArgMethod<
-      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
-      ArgValueMetadata
+      ArgOptionMetadata | ArgValueMetadata
     >
   | v.StrictTupleSchema<
       | Array<ArgMethod<ParsablePrimitiveSchema, ArgOptionMetadata>>

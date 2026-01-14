@@ -171,7 +171,7 @@ describe(parse, () => {
     expect(output).toStrictEqual(["hello", "world"])
   })
 
-  test.only("value", () => {
+  test("value", () => {
     const schema = value(v.string(), {
       type: "value",
       name: "greeting"
@@ -180,5 +180,16 @@ describe(parse, () => {
     const input = parse(schema, args)
     const output = v.parse(schema, input)
     expect(output).toBe("hello")
+  })
+
+  test("value number", () => {
+    const schema = value(v.number(), {
+      type: "value",
+      name: "greeting"
+    })
+    const args = ["2"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toBe(2)
   })
 })
