@@ -8,16 +8,6 @@ export function tuple<T extends ReadonlyArray<unknown>>(...inputs: T): T {
   return inputs
 }
 
-export function filterObject<T extends object>(
-  input: T
-): {
-  [P in keyof T as {} extends Pick<T, P> ? never : P]: T[P]
-} {
-  return Object.fromEntries(
-    Object.entries(input).filter(([_, value]) => value !== undefined)
-  ) as never
-}
-
 export function findExactlyOne<T, F extends (value: T) => boolean>(
   array: Array<T>,
   predicate: F
@@ -53,3 +43,15 @@ export function zip<T extends Array<unknown>, U extends Array<unknown>>(
     (_, index) => [left[index], right[index]] as const
   )
 }
+
+export type FindExactlyOne<
+  T extends readonly unknown[],
+  Target,
+  Count extends Target[] = []
+> = T extends [infer Head, ...infer Tail]
+  ? Head extends Target
+    ? FindExactlyOne<Tail, Target, [...Count, Head]>
+    : FindExactlyOne<Tail, Target, Count>
+  : Count["length"] extends 1
+    ? Count[0]
+    : never

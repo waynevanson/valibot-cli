@@ -1,5 +1,5 @@
 import * as v from "valibot"
-import { objectWithoutRestUndefined } from "../schema"
+import { objectWithoutRestUndefined } from "../utils"
 import { tuple } from "../utils"
 
 export type ArgToken = OptionToken | PrevaluesToken | ValueToken
