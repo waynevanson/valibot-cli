@@ -18,8 +18,6 @@ export function build<TSchema extends ParsableSchema>(
     case "number": {
       const metadata = getArgMethodMetadata(schema)
 
-      console.log({ metadata })
-
       const match = findExactlyOne(
         matches.args,
         (value) => value.name === metadata.name
