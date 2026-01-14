@@ -79,7 +79,6 @@ export function createMatches<TSchema extends ParsableSchema>(
 
           const metadata = getArgMethodMetadata(schema)
 
-          // normal flag
           matches.args.push({ name: metadata.name, value: token.value })
         } else {
           const metadata = findArgMethodMetadataByName(

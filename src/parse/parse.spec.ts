@@ -203,4 +203,15 @@ describe(parse, () => {
     const output = v.parse(schema, input)
     expect(output).toStrictEqual(["hello", "world"])
   })
+
+  test("values 2 numbers", () => {
+    const schema = value(v.array(v.number()), {
+      type: "value",
+      name: "greetings"
+    })
+    const args = ["6", "7"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual([6, 7])
+  })
 })
