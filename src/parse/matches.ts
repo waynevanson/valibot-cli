@@ -32,6 +32,7 @@ export function findArgMethodMetadataByName<TSchema extends ParsableSchema>(
     case "string":
       return getArgMethodMetadata(schema)
     case "strict_tuple":
+      // todo: maybe find all items?
       for (const item of schema.items) {
         const metadata = getArgMethodMetadata(item)
         const values = token.short ? metadata.shorts : metadata.longs

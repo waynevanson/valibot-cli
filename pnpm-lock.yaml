@@ -21,6 +21,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      valibot-fast-check:
+        specifier: ^0.1.1
+        version: 0.1.1(fast-check@4.5.3)(valibot@1.2.0(typescript@5.9.3))
       vite:
         specifier: ^7.3.0
         version: 7.3.0(@types/node@24.10.4)
@@ -567,6 +570,10 @@ packages:
   exsolve@1.0.8:
     resolution: {integrity: sha512-LmDxfWXwcTArk8fUEnOfSZpHOJ6zOMUJKOtFLFqJLoKJetuQG874Uc7/Kki7zFLzYybmZhp1M7+98pfMqeX8yA==}
 
+  fast-check@4.5.3:
+    resolution: {integrity: sha512-IE9csY7lnhxBnA8g/WI5eg/hygA6MGWJMSNfFRrBlXUciADEhS1EDB0SIsMSvzubzIlOBbVITSsypCsW717poA==}
+    engines: {node: '>=12.17.0'}
+
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -700,6 +707,9 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  pure-rand@7.0.1:
+    resolution: {integrity: sha512-oTUZM/NAZS8p7ANR3SHh30kXB+zK2r2BPcEn/awJIbOvq82WoMN4p62AWWp3Hhw50G0xMsw1mhIBLqHw64EcNQ==}
+
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
@@ -795,6 +805,12 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+
+  valibot-fast-check@0.1.1:
+    resolution: {integrity: sha512-fSu9yObLYfXSeiCSfAL/a6/CQB9s1PDrV0oaf4KHSgKvm3fnGd4PN3uK2weKp9VKaIwmK1yqB8s4emxkXTdSxA==}
+    peerDependencies:
+      fast-check: ^4.2.0
+      valibot: ^1.1.0
 
   valibot@1.2.0:
     resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
@@ -1355,6 +1371,10 @@ snapshots:
 
   exsolve@1.0.8: {}
 
+  fast-check@4.5.3:
+    dependencies:
+      pure-rand: 7.0.1
+
   fast-deep-equal@3.1.3: {}
 
   fdir@6.5.0(picomatch@4.0.3):
@@ -1471,6 +1491,8 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  pure-rand@7.0.1: {}
+
   quansync@0.2.11: {}
 
   require-from-string@2.0.2: {}
@@ -1562,6 +1584,11 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  valibot-fast-check@0.1.1(fast-check@4.5.3)(valibot@1.2.0(typescript@5.9.3)):
+    dependencies:
+      fast-check: 4.5.3
+      valibot: 1.2.0(typescript@5.9.3)
 
   valibot@1.2.0(typescript@5.9.3):
     optionalDependencies:
