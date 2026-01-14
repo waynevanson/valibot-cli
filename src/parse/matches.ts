@@ -1,5 +1,11 @@
 import { getArgMethodMetadata, isArgOptionMetadata } from "../methods"
-import { ArgTokens, OptionLongToken, OptionShortToken } from "./arg-token"
+import {
+  ArgToken,
+  ArgTokens,
+  OptionLongToken,
+  OptionShortToken,
+  OptionToken
+} from "./arg-token"
 import { ParsableSchema } from "./parse"
 
 export type Args = Array<{
@@ -19,7 +25,7 @@ export interface Matches {
 
 export function findArgMethodMetadataByName<TSchema extends ParsableSchema>(
   schema: TSchema,
-  options: { short: boolean; name: string }
+  token: OptionToken
 ) {
   switch (schema.type) {
     case "array":
@@ -29,8 +35,8 @@ export function findArgMethodMetadataByName<TSchema extends ParsableSchema>(
     case "strict_tuple":
       for (const item of schema.items) {
         const metadata = getArgMethodMetadata(item)
-        const values = options.short ? metadata.shorts : metadata.longs
-        if (values.includes(options.name)) {
+        const values = token.short ? metadata.shorts : metadata.longs
+        if (values.includes(token.identifier)) {
           return metadata
         }
       }
@@ -52,18 +58,15 @@ export function createMatches<TSchema extends ParsableSchema>(
   for (const token of tokens) {
     switch (token.type) {
       case "option": {
-        const metadata = findArgMethodMetadataByName(schema, {
-          short: token.short,
-          name: token.identifier
-        })
-
-        if (!isArgOptionMetadata(metadata)) {
-          throw new Error()
-        }
-
         if (token.value === undefined) {
           previousShortToken = token
         } else {
+          const metadata = findArgMethodMetadataByName(schema, token)
+
+          if (!isArgOptionMetadata(metadata)) {
+            throw new Error()
+          }
+
           matches.args.push({ name: metadata.name, value: token.value })
         }
 
@@ -74,10 +77,7 @@ export function createMatches<TSchema extends ParsableSchema>(
           throw new Error()
         }
 
-        const metadata = findArgMethodMetadataByName(schema, {
-          short: previousShortToken.short,
-          name: previousShortToken.identifier
-        })
+        const metadata = findArgMethodMetadataByName(schema, previousShortToken)
 
         if (!isArgOptionMetadata(metadata)) {
           throw new Error()
