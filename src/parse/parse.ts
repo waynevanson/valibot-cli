@@ -1,5 +1,5 @@
 import * as v from "valibot"
-import { ArgMethod, ArgOptionMetadata } from "../methods"
+import { ArgMethod, ArgOptionMetadata, ArgValueMetadata } from "../methods"
 import { createArgsTokens } from "./arg-token"
 import { createMatches } from "./matches"
 import { build } from "./build"
@@ -20,6 +20,10 @@ export type ParsableSchema =
   | ArgMethod<
       ParsablePrimitiveSchema | ParsableContainerSchema,
       ArgOptionMetadata
+    >
+  | ArgMethod<
+      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+      ArgValueMetadata
     >
   | v.StrictTupleSchema<
       | Array<ArgMethod<ParsablePrimitiveSchema, ArgOptionMetadata>>

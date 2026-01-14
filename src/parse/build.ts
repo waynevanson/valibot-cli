@@ -18,9 +18,7 @@ export function build<TSchema extends ParsableSchema>(
     case "number": {
       const metadata = getArgMethodMetadata(schema)
 
-      if (!isArgOptionMetadata(metadata)) {
-        throw new Error()
-      }
+      console.log({ metadata })
 
       const match = findExactlyOne(
         matches.args,

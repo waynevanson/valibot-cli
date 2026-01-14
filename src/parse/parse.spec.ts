@@ -170,4 +170,15 @@ describe(parse, () => {
     const output = v.parse(schema, input)
     expect(output).toStrictEqual(["hello", "world"])
   })
+
+  test.only("value", () => {
+    const schema = value(v.string(), {
+      type: "value",
+      name: "greeting"
+    })
+    const args = ["hello"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toBe("hello")
+  })
 })

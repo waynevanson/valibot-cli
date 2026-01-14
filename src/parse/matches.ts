@@ -1,6 +1,5 @@
 import { getArgMethodMetadata, isArgOptionMetadata } from "../methods"
 import {
-  ArgToken,
   ArgTokens,
   OptionLongToken,
   OptionShortToken,
@@ -73,18 +72,28 @@ export function createMatches<TSchema extends ParsableSchema>(
         break
       }
       case "value": {
-        if (!previousShortToken) {
-          throw new Error()
+        if (previousShortToken === undefined) {
+          if (schema.type !== "string") {
+            throw new Error()
+          }
+
+          const metadata = getArgMethodMetadata(schema)
+
+          // normal flag
+          matches.args.push({ name: metadata.name, value: token.value })
+        } else {
+          const metadata = findArgMethodMetadataByName(
+            schema,
+            previousShortToken
+          )
+
+          if (!isArgOptionMetadata(metadata)) {
+            throw new Error()
+          }
+
+          matches.args.push({ name: metadata.name, value: token.value })
+          previousShortToken = undefined
         }
-
-        const metadata = findArgMethodMetadataByName(schema, previousShortToken)
-
-        if (!isArgOptionMetadata(metadata)) {
-          throw new Error()
-        }
-
-        matches.args.push({ name: metadata.name, value: token.value })
-        previousShortToken = undefined
 
         break
       }
