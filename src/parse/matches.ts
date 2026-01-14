@@ -73,7 +73,7 @@ export function createMatches<TSchema extends ParsableSchema>(
       }
       case "value": {
         if (previousShortToken === undefined) {
-          if (schema.type !== "string" && schema.type !== "number") {
+          if (schema.type === "strict_tuple") {
             throw new Error()
           }
 

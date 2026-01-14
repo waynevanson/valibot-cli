@@ -47,10 +47,6 @@ export function build<TSchema extends ParsableSchema>(
 
       const metadata = getArgMethodMetadata(schema_)
 
-      if (!isArgOptionMetadata(metadata)) {
-        throw new Error()
-      }
-
       return matches.args
         .filter((match) => match.name === metadata.name)
         .map((match) => stringify(schema_.item.type, match.value))

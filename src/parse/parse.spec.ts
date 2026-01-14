@@ -192,4 +192,15 @@ describe(parse, () => {
     const output = v.parse(schema, input)
     expect(output).toBe(2)
   })
+
+  test("values 2 strings", () => {
+    const schema = value(v.array(v.string()), {
+      type: "value",
+      name: "greetings"
+    })
+    const args = ["hello", "world"]
+    const input = parse(schema, args)
+    const output = v.parse(schema, input)
+    expect(output).toStrictEqual(["hello", "world"])
+  })
 })
