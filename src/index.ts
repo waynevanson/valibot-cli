@@ -8,4 +8,4 @@ export {
   ArgMethod,
   ArgSubcommandMetadata
 } from "./methods"
-export { parse } from "./parse"
+export { parse, ParsableSchema } from "./parse"
