@@ -55,3 +55,5 @@ export type FindExactlyOne<
   : Count["length"] extends 1
     ? Count[0]
     : never
+
+export type MaybeReadonly<T> = T | Readonly<T>

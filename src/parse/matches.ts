@@ -1,110 +1,75 @@
-import { getArgMethodMetadata, isArgOptionMetadata } from "../methods"
+import { ArgMetadata, ArgOptionMetadata, ArgValueMetadata } from "../methods"
 import {
-  ArgTokens,
+  ArgsToken,
   OptionLongToken,
   OptionShortToken,
   OptionToken
 } from "./arg-token"
-import { ParsableSchema } from "./parse"
+import { Unmatches, UnmatchesNodeArg } from "./unmatches"
 
-export type Args = Array<{
-  name: string
+interface MatchesState {
+  matches: Matches
+}
+
+export interface Matches extends Map<
+  symbol,
+  { name: string; values: Array<string> }
+> {}
+
+export type Match = UnmatchesNodeArg<ArgOptionMetadata | ArgValueMetadata> & {
   value: string
-}>
-
-export interface Matches {
-  args: Args
-  subcommand:
-    | undefined
-    | {
-        name: string
-        matches: Matches
-      }
 }
 
-export function findArgMethodMetadataByName<TSchema extends ParsableSchema>(
-  schema: TSchema,
-  token: OptionToken
-) {
-  switch (schema.type) {
-    case "array":
-    case "number":
-    case "string":
-      return getArgMethodMetadata(schema)
-    case "strict_tuple":
-      // todo: maybe find all items?
-      for (const item of schema.items) {
-        const metadata = getArgMethodMetadata(item)
-        const values = token.short ? metadata.shorts : metadata.longs
-        if (values.includes(token.identifier)) {
-          return metadata
-        }
-      }
-      throw new Error()
-    default: {
-      throw new Error()
-    }
-  }
-}
-
-export function createMatches<TSchema extends ParsableSchema>(
-  schema: TSchema,
-  tokens: ArgTokens
+// basically add values
+export function createMatches(
+  unmatches: Unmatches,
+  tokens: Array<ArgsToken>
 ): Matches {
-  const matches: Matches = { args: [], subcommand: undefined }
-
-  let previousShortToken: undefined | OptionShortToken | OptionLongToken
-
-  for (const token of tokens) {
+  function walk(state: MatchesState, token: ArgsToken): MatchesState {
     switch (token.type) {
       case "option": {
-        if (token.value === undefined) {
-          previousShortToken = token
-        } else {
-          const metadata = findArgMethodMetadataByName(schema, token)
+        // find node that as a value and a string
+        const node = getNodeForOptionValueString(unmatches, token)
 
-          if (!isArgOptionMetadata(metadata)) {
-            throw new Error()
-          }
-
-          matches.args.push({ name: metadata.name, value: token.value })
+        if (node === undefined) {
+          throw new Error()
         }
 
-        break
+        // `--<identifier>=<value>`
+        state.matches.set(node.id, node)
+
+        return new Map()
       }
-      case "value": {
-        if (previousShortToken === undefined) {
-          if (schema.type === "strict_tuple") {
-            throw new Error()
-          }
 
-          const metadata = getArgMethodMetadata(schema)
-
-          matches.args.push({ name: metadata.name, value: token.value })
-        } else {
-          const metadata = findArgMethodMetadataByName(
-            schema,
-            previousShortToken
-          )
-
-          if (!isArgOptionMetadata(metadata)) {
-            throw new Error()
-          }
-
-          matches.args.push({ name: metadata.name, value: token.value })
-          previousShortToken = undefined
-        }
-
-        break
-      }
       default:
         throw new Error()
     }
   }
 
-  if (previousShortToken !== undefined) {
-    throw new Error()
-  }
+  const state = tokens.reduce(
+    (state: MatchesState, token) => walk(state, token),
+    { matches: new Map() }
+  )
 
-  return matches
+  // validate we've iterated through all required values
+  // in unmatches
+
+  return state.matches
+}
+
+export function getNodeForOptionValueString(
+  unmatches: Unmatches,
+  token: OptionToken
+) {
+  for (const node of unmatches.args.value) {
+    if (node.metadata.type !== "option") {
+      continue
+    }
+
+    const identifiers = token.short ? node.metadata.shorts : node.metadata.longs
+
+    if (identifiers.includes(token.identifier)) {
+      return node
+    }
+  }
 }
