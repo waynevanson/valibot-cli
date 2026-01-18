@@ -68,9 +68,10 @@ export function BaseIssue<Input>(input: v.GenericSchema<Input>) {
 }
 
 export function BaseSchema<Input, Output>() {
-  return v.object({
+  return v.strictObject({
     kind: v.literal("schema"),
     type: v.string(),
+    // don't know how to type this well
     reference: v.any(),
     expects: v.string(),
     async: v.literal(false),
@@ -79,16 +80,14 @@ export function BaseSchema<Input, Output>() {
   }) satisfies v.GenericSchema<v.BaseSchema<Input, Output, v.BaseIssue<Input>>>
 }
 
-export function StringSchema() {
-  return v.looseObject({
+export function StringSchema(
+  message?: v.GenericSchema<v.ErrorMessage<v.StringIssue> | undefined>
+) {
+  return v.object({
+    ...BaseSchema().entries,
     type: v.literal("string"),
     expects: v.literal("string"),
-    message: v.any(),
-    kind: v.literal("schema"),
-    async: v.literal(false),
-    reference: v.any(),
-    "~standard": v.any(),
-    "~run": v.any()
+    message: message ?? v.undefined()
   }) satisfies v.GenericSchema<
     v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   >
@@ -99,7 +98,7 @@ export function MetadataSchema<ObjectEntries extends v.ObjectEntries>(
     v.ErrorMessage<v.ObjectIssue> | undefined
   >
 ) {
-  return v.looseObject({
+  return v.strictObject({
     kind: v.literal("metadata"),
     type: v.literal("metadata"),
     metadata,
@@ -116,7 +115,7 @@ export function StrictTuple<
   TupleItems extends MaybeReadonly<Array<v.GenericSchema<v.GenericSchema>>>
 >(items: TupleItems) {
   return v.pipe(
-    v.looseObject({
+    v.strictObject({
       kind: v.literal("schema"),
       type: v.literal("strict_tuple"),
       expects: v.literal("Array"),
@@ -142,9 +141,9 @@ export function SchemaWithPipe<
   ]
 >(...pipe: Pipe) {
   return v.intersect([
-    v.strictObject({
+    pipe[0],
+    v.object({
       pipe: v.strictTuple(pipe)
-    }),
-    pipe[0]
+    })
   ])
 }

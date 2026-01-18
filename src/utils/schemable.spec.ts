@@ -21,11 +21,9 @@ describe("", () => {
     v.parse(Schema, Value)
   })
 
-  test.skip("brah", () => {
+  test("brah", () => {
     const Schema = s.SchemaWithPipe(s.StringSchema())
     const Value = v.pipe(v.string())
-    let a = v.safeParse(Schema, Value)
-    console.log(a.issues?.[0])
-    if (!a.success) throw a.issues[0]
+    v.parse(Schema, Value)
   })
 })
