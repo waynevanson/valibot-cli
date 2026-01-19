@@ -1,18 +1,11 @@
 import * as v from "valibot"
 import { ArgMetadata } from "./arg-metadata"
-import * as s from "../utils/schemable"
 
 export const ARG_METADATA = Symbol("ARG_METADATA")
 export type ARG_METADATA = typeof ARG_METADATA
 
-const ArgMethod = s.MetadataSchema(
-  v.object({
-    [ARG_METADATA]: v.string()
-  })
-)
-
 export type ArgMethod<
-  TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+  TSchema extends v.GenericSchema,
   T extends ArgMetadata
 > = v.SchemaWithPipe<
   readonly [
@@ -22,18 +15,15 @@ export type ArgMethod<
 >
 
 export function arg<
-  TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+  TSchema extends v.GenericSchema,
   TArgMetadata extends ArgMetadata
 >(schema: TSchema, internal: TArgMetadata): ArgMethod<TSchema, TArgMetadata> {
   return v.pipe(schema, v.metadata({ [ARG_METADATA]: internal }))
 }
 
-export function isArgMethod<
-  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>
->(
+export function isArgMethod<T extends v.GenericSchema>(
   schema: T
-): schema is T &
-  ArgMethod<v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>, ArgMetadata> {
+): schema is T & ArgMethod<v.GenericSchema, ArgMetadata> {
   return (
     "pipe" in schema &&
     Array.isArray(schema.pipe) &&
@@ -46,7 +36,7 @@ export function isArgMethod<
 }
 
 export function getArgMethodMetadata<
-  TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+  TSchema extends v.GenericSchema,
   TArgMetadata extends ArgMetadata
 >(schema: ArgMethod<TSchema, TArgMetadata>): TArgMetadata {
   return schema.pipe[1].metadata[ARG_METADATA]

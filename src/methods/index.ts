@@ -1,5 +1,5 @@
 export * from "./subcommand"
 export * from "./option"
 export * from "./value"
-export * from "./arg"
+export * from "./arg-method"
 export * from "./arg-metadata"

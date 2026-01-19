@@ -1,54 +1,68 @@
-import { ArgMetadata, ArgOptionMetadata, ArgValueMetadata } from "../methods"
-import {
-  ArgsToken,
-  OptionLongToken,
-  OptionShortToken,
-  OptionToken
-} from "./arg-token"
-import { Unmatches, UnmatchesNodeArg } from "./unmatches"
+import { ArgsToken, ArgsTokens, OptionToken } from "./arg-token"
+import { ArgOptionMetadata } from "../methods/arg-metadata"
+import { Unmatches } from "./unmatches"
+import * as v from "valibot"
 
 interface MatchesState {
   matches: Matches
 }
 
-export interface Matches extends Map<
-  symbol,
-  { name: string; values: Array<string> }
-> {}
+export class Matches extends Map<symbol, Match> {}
 
-export type Match = UnmatchesNodeArg<ArgOptionMetadata | ArgValueMetadata> & {
+export type Match = {
+  name: string
+  value: MatchValue
+}
+
+// todo: add more after testing success
+export type MatchValue = MatchValueString
+
+export type MatchValueString = {
+  type: "string"
   value: string
+}
+
+export type MatchValueBoolean = {
+  type: "boolean"
+  value: boolean | undefined
 }
 
 // basically add values
 export function createMatches(
   unmatches: Unmatches,
-  tokens: Array<ArgsToken>
+  tokens: ArgsTokens
 ): Matches {
   function walk(state: MatchesState, token: ArgsToken): MatchesState {
     switch (token.type) {
       case "option": {
         // find node that as a value and a string
-        const node = getNodeForOptionValueString(unmatches, token)
+        const unmatch = getNodeForOptionValueString(unmatches, token)
 
-        if (node === undefined) {
+        if (unmatch === undefined) {
           throw new Error()
         }
 
-        // `--<identifier>=<value>`
-        state.matches.set(node.id, node)
+        if (token.value === undefined) {
+          throw new Error()
+        }
 
-        return new Map()
+        const value: MatchValue = { type: "string", value: token.value }
+        const match: Match = { name: unmatch.metadata.name, value }
+
+        state.matches.set(unmatch.ref, match)
+        break
       }
 
       default:
         throw new Error()
     }
+
+    return state
   }
 
   const state = tokens.reduce(
     (state: MatchesState, token) => walk(state, token),
-    { matches: new Map() }
+    { matches: new Matches() }
   )
 
   // validate we've iterated through all required values
@@ -61,15 +75,31 @@ export function getNodeForOptionValueString(
   unmatches: Unmatches,
   token: OptionToken
 ) {
-  for (const node of unmatches.args.value) {
-    if (node.metadata.type !== "option") {
-      continue
+  switch (unmatches.type) {
+    case "string": {
+      if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
+        console.log("brok")
+        break
+      }
+
+      const identifiers = token.short
+        ? unmatches.metadata.shorts
+        : unmatches.metadata.longs
+
+      if (!identifiers.includes(token.identifier)) {
+        break
+      }
+
+      return unmatches
     }
 
-    const identifiers = token.short ? node.metadata.shorts : node.metadata.longs
+    case "strict_tuple": {
+    }
 
-    if (identifiers.includes(token.identifier)) {
-      return node
+    default: {
+      throw new Error()
     }
   }
+
+  return undefined
 }

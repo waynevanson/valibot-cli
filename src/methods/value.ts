@@ -1,6 +1,6 @@
 import * as v from "valibot"
 import { ArgValueMetadata } from "./arg-metadata"
-import { arg } from "./arg"
+import { arg } from "./arg-method"
 import { MaybeReadonly } from "../utils"
 
 export type ValueSchema =

@@ -1,6 +1,6 @@
 import * as v from "valibot"
 import { ArgOptionMetadata } from "./arg-metadata"
-import { arg } from "./arg"
+import { arg } from "./arg-method"
 
 export type OptionSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>

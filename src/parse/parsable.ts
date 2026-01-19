@@ -18,19 +18,3 @@ export type ParsableSchemaPrimitive = ParsableSchemaString
 export type ParsableSchema<TupleItems extends v.TupleItems> =
   | ParsableSchemaString
   | ParsableSchemaStrictTuple<TupleItems>
-
-const ParsableSchemaString = v.object({
-  type: v.literal("string"),
-  pipe: v.strictTuple([
-    v.object({
-      type: v.literal("string")
-    }),
-    v.object({
-      kind: v.literal("metadata"),
-      type: v.literal("metadata"),
-      metadata: v.object({
-        [ARG_METADATA]: ArgMetadata
-      })
-    })
-  ])
-})

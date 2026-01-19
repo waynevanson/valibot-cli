@@ -49,6 +49,7 @@ export type ValueToken = {
 }
 
 export type ArgTokens = Array<ArgToken>
+export type ArgsTokens = Array<ArgsToken>
 
 const LONG_FLAG_REGEXP = /(?<long>--(?<identifier>[^=]+)(=(?<value>.+))?)/
 

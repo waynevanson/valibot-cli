@@ -1,6 +1,6 @@
 import * as v from "valibot"
 import { ArgSubcommandMetadata } from "./arg-metadata"
-import { arg } from "./arg"
+import { arg } from "./arg-method"
 
 export type Subcommand =
   | v.ArraySchema<

@@ -9,9 +9,9 @@ export const ArgValueMetadata = v.object({
 
 export type ArgValueMetadata = v.InferOutput<typeof ArgValueMetadata>
 
-const longs = v.pipe(v.array(name), v.minLength(1))
+const longs = v.pipe(v.array(name))
 const char = v.pipe(v.string(), v.minLength(1), v.maxLength(1))
-const shorts = v.pipe(v.array(char), v.minLength(1))
+const shorts = v.pipe(v.array(char))
 
 export const ArgOptionMetadata = v.object({
   type: v.literal("option"),
