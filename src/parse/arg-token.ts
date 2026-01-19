@@ -142,37 +142,39 @@ export function createArgTokens(arg: string) {
   return v.parse(all, matches.groups)
 }
 
-export const State = {
-  Normal: 0,
-  Set: 1,
-  Wired: 2
-} as const
+export class Trailing {
+  private trailing: 0 | 1 | 2 = 0
 
-export type State = (typeof State)[keyof typeof State]
+  push() {
+    if (this.trailing < 2) {
+      this.trailing++
+    }
+  }
 
-function saturate(state: State): State {
-  if (state === State.Normal) {
-    return State.Set
-  } else {
-    return State.Wired
+  isTrailing() {
+    return this.trailing > 0
+  }
+
+  isTrailingRequired() {
+    return this.trailing === 1
   }
 }
 
 export function createArgsTokens(args: Array<string>): Array<ArgsToken> {
-  let state: State = State.Normal
+  const trailing = new Trailing()
 
   const argsToken: Array<ArgsToken> = []
 
   for (const arg of args) {
-    if (state > State.Normal) {
+    if (trailing.isTrailing()) {
       argsToken.push({ type: "value", value: arg })
-      state = saturate(state)
+      trailing.push()
     }
 
     for (const argToken of createArgTokens(arg)) {
       switch (argToken.type) {
         case "prevalues": {
-          state = saturate(state)
+          trailing.push()
           break
         }
 
@@ -184,7 +186,7 @@ export function createArgsTokens(args: Array<string>): Array<ArgsToken> {
     }
   }
 
-  if (state === State.Set) {
+  if (trailing.isTrailingRequired()) {
     throw new Error("Expected to emit value arg after providing `--`")
   }
 
