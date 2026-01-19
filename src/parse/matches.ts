@@ -1,6 +1,6 @@
 import { ArgsToken, ArgsTokens, OptionToken } from "./arg-token"
 import { ArgOptionMetadata } from "../methods/arg-metadata"
-import { Unmatches } from "./unmatches"
+import { Unmatches, UnmatchesNodeString } from "./unmatches"
 import * as v from "valibot"
 
 interface MatchesState {
@@ -75,31 +75,42 @@ export function getNodeForOptionValueString(
   unmatches: Unmatches,
   token: OptionToken
 ) {
-  switch (unmatches.type) {
-    case "string": {
-      if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
-        console.log("brok")
-        break
+  function walk(unmatches: Unmatches): UnmatchesNodeString | undefined {
+    switch (unmatches.type) {
+      case "string": {
+        if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
+          console.log("brok")
+          break
+        }
+
+        const identifiers = token.short
+          ? unmatches.metadata.shorts
+          : unmatches.metadata.longs
+
+        if (!identifiers.includes(token.identifier)) {
+          break
+        }
+
+        return unmatches
       }
 
-      const identifiers = token.short
-        ? unmatches.metadata.shorts
-        : unmatches.metadata.longs
+      case "strict_tuple": {
+        for (const item of unmatches.items) {
+          const unmatch = walk(item)
 
-      if (!identifiers.includes(token.identifier)) {
-        break
+          if (unmatch !== undefined) {
+            return unmatch
+          }
+        }
       }
 
-      return unmatches
+      default: {
+        throw new Error()
+      }
     }
 
-    case "strict_tuple": {
-    }
-
-    default: {
-      throw new Error()
-    }
+    return undefined
   }
 
-  return undefined
+  return walk(unmatches)
 }

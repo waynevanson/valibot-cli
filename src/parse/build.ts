@@ -1,25 +1,36 @@
-import * as v from "valibot"
 import { Matches } from "./matches"
-import { ParsableSchema } from "./parse"
 import { Unmatches } from "./unmatches"
 
-export function build<TSchema extends ParsableSchema>(
-  unmatches: Unmatches,
-  matches: Matches
-): v.InferInput<TSchema> {
-  switch (unmatches.type) {
-    case "string":
-      const match = matches.get(unmatches.ref)
+type BuildOutput = Array<BuildOutput> | string
 
-      if (match === undefined) {
-        throw new Error()
+export function build(unmatches: Unmatches, matches: Matches): BuildOutput {
+  function walk(unmatches: Unmatches) {
+    switch (unmatches.type) {
+      case "string":
+        const match = matches.get(unmatches.ref)
+
+        if (match === undefined) {
+          throw new Error()
+        }
+
+        return match.value.value
+
+      case "strict_tuple": {
+        const tuple: BuildOutput = []
+
+        for (const unmatch of unmatches.items) {
+          const match = walk(unmatch)
+          tuple.push(match)
+        }
+
+        return tuple
       }
 
-      return match.value.value
-
-    case "strict_tuple":
-    default: {
-      throw new Error()
+      default: {
+        throw new Error()
+      }
     }
   }
+
+  return walk(unmatches)
 }

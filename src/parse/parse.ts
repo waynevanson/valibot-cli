@@ -34,5 +34,5 @@ export function parse<TSchema extends ParsableSchema>(
   const tokens = createArgsTokens(args)
   const matches = createMatches(unmatches, tokens)
   const input = build(unmatches, matches)
-  return input
+  return input as never
 }
