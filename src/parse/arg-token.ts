@@ -1,6 +1,6 @@
 import * as v from "valibot"
-import { objectWithoutRestUndefined } from "../utils"
-import { tuple } from "../utils"
+import { objectWithoutRestUndefined } from "../utils/index.js"
+import { tuple } from "../utils/index.js"
 
 export type ArgToken = OptionToken | PrevaluesToken | ValueToken
 export type ArgsToken = OptionToken | ValueToken

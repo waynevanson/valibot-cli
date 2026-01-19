@@ -1,11 +1,2 @@
-export {
-  option,
-  subcommand,
-  value,
-  ArgMetadata,
-  ArgValueMetadata,
-  ArgOptionMetadata,
-  ArgMethod,
-  ArgSubcommandMetadata
-} from "./methods"
-export { parse, ParsableSchema } from "./parse"
+export { option, subcommand, value } from "./methods/index.js"
+export { parse } from "./parse/index.js"

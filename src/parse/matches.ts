@@ -1,6 +1,6 @@
-import { ArgsToken, ArgsTokens, OptionToken } from "./arg-token"
-import { ArgOptionMetadata } from "../methods/arg-metadata"
-import { Unmatches, UnmatchesNodeString } from "./unmatches"
+import { ArgsToken, ArgsTokens, OptionToken } from "./arg-token.js"
+import { ArgOptionMetadata } from "../methods/arg-metadata.js"
+import { Unmatches, UnmatchesNodeString } from "./unmatches.js"
 import * as v from "valibot"
 
 interface MatchesState {

@@ -1,5 +1,9 @@
 import * as v from "valibot"
-import { ArgMethod, ArgValueMetadata, ArgOptionMetadata } from "../methods"
+import {
+  ArgMethod,
+  ArgValueMetadata,
+  ArgOptionMetadata
+} from "../methods/index.js"
 
 export type ParsableSchemaString = ArgMethod<
   v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,

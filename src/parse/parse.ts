@@ -1,10 +1,14 @@
 import * as v from "valibot"
-import { ArgMethod, ArgOptionMetadata, ArgValueMetadata } from "../methods"
-import { createArgsTokens } from "./arg-token"
-import { build } from "./build"
-import { createMatches } from "./matches"
-import { createUnmatches } from "./unmatches"
-import { MaybeReadonly } from "../utils"
+import {
+  ArgMethod,
+  ArgOptionMetadata,
+  ArgValueMetadata
+} from "../methods/index.js"
+import { createArgsTokens } from "./arg-token.js"
+import { build } from "./build.js"
+import { createMatches } from "./matches.js"
+import { createUnmatches } from "./unmatches.js"
+import { MaybeReadonly } from "../utils/index.js"
 
 // at the start we allow all args
 // but we eventually it gets narrowed down

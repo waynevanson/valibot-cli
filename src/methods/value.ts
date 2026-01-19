@@ -1,7 +1,7 @@
 import * as v from "valibot"
-import { ArgValueMetadata } from "./arg-metadata"
-import { arg } from "./arg-method"
-import { MaybeReadonly } from "../utils"
+import { ArgValueMetadata } from "./arg-metadata.js"
+import { arg } from "./arg-method.js"
+import type { MaybeReadonly } from "../utils/index.js"
 
 export type ValueSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>

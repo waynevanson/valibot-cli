@@ -3,6 +3,7 @@
     "strict": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "target": "esnext"
+    "target": "esnext",
+    "composite": true
   }
 }

@@ -1,5 +1,5 @@
 import * as v from "valibot"
-import { arg } from "./arg-method"
+import { arg } from "./arg-method.js"
 
 export type OptionSchema = v.StringSchema<
   v.ErrorMessage<v.StringIssue> | undefined

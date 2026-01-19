@@ -1,5 +1,5 @@
 import * as v from "valibot"
-import { filterObject } from "."
+import { filterObject } from "./object.js"
 
 export function objectWithoutRestUndefined<
   const Entries extends v.ObjectEntries

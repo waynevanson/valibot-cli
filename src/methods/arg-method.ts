@@ -1,5 +1,5 @@
 import * as v from "valibot"
-import { ArgMetadata } from "./arg-metadata"
+import { ArgMetadata } from "./arg-metadata.js"
 
 export const ARG_METADATA = Symbol("ARG_METADATA")
 export type ARG_METADATA = typeof ARG_METADATA

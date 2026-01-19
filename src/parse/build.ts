@@ -1,5 +1,5 @@
-import { Matches } from "./matches"
-import { Unmatches } from "./unmatches"
+import { Matches } from "./matches.js"
+import { Unmatches } from "./unmatches.js"
 
 type BuildOutput = Array<BuildOutput> | string
 

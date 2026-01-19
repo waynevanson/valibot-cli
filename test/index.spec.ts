@@ -1,4 +1,4 @@
-import * as c from "../src"
+import * as c from "../src/index.js"
 import { describe, test, expect } from "vitest"
 import * as v from "valibot"
 

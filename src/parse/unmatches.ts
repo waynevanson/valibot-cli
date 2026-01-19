@@ -3,9 +3,9 @@ import {
   ArgOptionMetadata,
   ArgValueMetadata,
   getArgMethodMetadata
-} from "../methods"
-import { MaybeReadonly } from "../utils"
-import { ParsableSchema } from "./parsable"
+} from "../methods/index.js"
+import { MaybeReadonly } from "../utils/index.js"
+import { ParsableSchema } from "./parsable.js"
 
 export type UnmatchesNodeString = {
   ref: symbol
