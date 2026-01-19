@@ -67,14 +67,14 @@ const fixtures = [
     ]
   }),
   fixture({
-    name: "string positional",
+    name: "value([string]) positional",
     schema: c.value(v.string(), {
       name: "greeting"
     }),
     cases: [{ argv: ["hello"], expected: "hello" }]
   }),
   fixture({
-    name: "string positional tupe",
+    name: "strict_tuple([value(string)]) positional",
     schema: v.strictTuple([
       c.value(v.string(), {
         name: "greeting"
