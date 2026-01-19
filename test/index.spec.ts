@@ -10,40 +10,45 @@ interface Prop<Schema extends ParsableSchema> {
 }
 
 function property<Schema extends ParsableSchema>(prop: Prop<Schema>) {
-  const parsed = c.parse(prop.schema, prop.argv)
-  expect(parsed).toStrictEqual(prop.expected)
-
-  const validated = v.safeParse(prop.schema, parsed)
-  expect(validated).containSubset({
-    issues: undefined,
-    success: true
-  })
+  return prop
 }
 
 describe(c.parse.name, () => {
-  describe("string", () => {
-    test("should pass a flag with a valsue", () => {
-      const schema = c.option(v.string(), {
-        name: "greeting",
-        longs: ["greeting"]
-      })
-      const argv = ["--greeting=hello"]
-      const expected = "hello"
-
-      property({ schema, argv, expected })
-    })
-  })
-
-  describe("strict_tuple string", () => {
-    test("should pass a flag with a value", () => {
-      const schema = v.strictTuple([
-        c.option(v.string(), {
+  test.each([
+    [
+      "string",
+      property({
+        schema: c.option(v.string(), {
           name: "greeting",
           longs: ["greeting"]
-        })
-      ])
-      const argv = ["--greeting=hello"]
-      property({ argv, expected: ["hello"], schema })
+        }),
+        argv: ["--greeting=hello"],
+        expected: "hello"
+      })
+    ],
+    [
+      "strict_tuple string",
+      property({
+        schema: v.strictTuple([
+          c.option(v.string(), {
+            name: "greeting",
+            longs: ["greeting"]
+          })
+        ]),
+        argv: ["--greeting=hello"],
+        expected: ["hello"]
+      })
+    ]
+  ])("%s", (_name, prop) => {
+    // parse = argv + schema
+    const parsed = c.parse(prop.schema, prop.argv)
+    expect(parsed).toStrictEqual(prop.expected)
+
+    // validate = parsed + schema
+    const validated = v.safeParse(prop.schema, parsed)
+    expect(validated).containSubset({
+      issues: undefined,
+      success: true
     })
   })
 })
