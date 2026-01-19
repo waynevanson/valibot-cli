@@ -15,7 +15,7 @@ function property<Schema extends ParsableSchema>(prop: Prop<Schema>) {
 
 const fixtures = [
   [
-    "string",
+    "string unspaced",
     property({
       schema: c.option(v.string(), {
         name: "greeting",
@@ -58,6 +58,16 @@ const fixtures = [
       ]),
       argv: ["--greeting=hello"],
       expected: ["hello"]
+    })
+  ],
+  [
+    "string positional",
+    property({
+      schema: c.value(v.string(), {
+        name: "greeting"
+      }),
+      argv: ["hello"],
+      expected: "hello"
     })
   ]
 ] as const

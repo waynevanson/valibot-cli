@@ -1,5 +1,5 @@
-import { ArgsToken, ArgsTokens, OptionToken } from "./arg-token.js"
-import { ArgOptionMetadata } from "../methods/arg-metadata.js"
+import { ArgsToken, ArgsTokens, OptionToken, ValueToken } from "./arg-token.js"
+import { ArgOptionMetadata, ArgValueMetadata } from "../methods/arg-metadata.js"
 import { Unmatches, UnmatchesNodeString } from "./unmatches.js"
 import * as v from "valibot"
 
@@ -60,16 +60,26 @@ export function createMatches(
 
       case "value": {
         if (state.previous === undefined) {
-          throw new Error()
+          // `<value>`
+          const unmatch = getNodeValueForString(unmatches)
+
+          if (unmatch === undefined) {
+            throw new Error()
+          }
+
+          const value: MatchValue = { type: "string", value: token.value }
+          const match: Match = { name: unmatch.metadata.name, value }
+          state.matches.set(unmatch.ref, match)
+        } else {
+          // `--<identifier> <value>`
+
+          const unmatch = state.previous
+          state.previous = undefined
+
+          const value: MatchValue = { type: "string", value: token.value }
+          const match: Match = { name: unmatch.metadata.name, value }
+          state.matches.set(unmatch.ref, match)
         }
-
-        const unmatch = state.previous
-        state.previous = undefined
-
-        const value: MatchValue = { type: "string", value: token.value }
-        const match: Match = { name: unmatch.metadata.name, value }
-        state.matches.set(unmatch.ref, match)
-
         break
       }
 
@@ -89,6 +99,38 @@ export function createMatches(
   // in unmatches
 
   return state.matches
+}
+
+export function getNodeValueForString(unmatches: Unmatches) {
+  function walk(unmatches: Unmatches): UnmatchesNodeString | undefined {
+    switch (unmatches.type) {
+      case "string": {
+        if (!v.is(ArgValueMetadata, unmatches.metadata)) {
+          break
+        }
+
+        return unmatches
+      }
+
+      case "strict_tuple": {
+        for (const item of unmatches.items) {
+          const unmatch = walk(item)
+
+          if (unmatch !== undefined) {
+            return unmatch
+          }
+        }
+      }
+
+      default: {
+        throw new Error()
+      }
+    }
+
+    return undefined
+  }
+
+  return walk(unmatches)
 }
 
 export function getNodeForOptionString(
