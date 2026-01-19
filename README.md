@@ -1,4 +1,4 @@
-# `@waynevanson/cli`
+# `@waynevanson/valibot-cli`
 
 A valibot powered CLI builder.
 
