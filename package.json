@@ -1,25 +1,37 @@
 {
   "name": "@waynevanson/valibot-cli",
+  "version": "0.1.0",
   "private": false,
-  "version": "0.0.0",
+  "description": "A valibot powered CLI builder.",
+  "homepage": "https://github.com/waynevanson/valibot-cli#readme",
+  "bugs": {
+    "url": "https://github.com/waynevanson/valibot-cli/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waynevanson/valibot-cli.git"
+  },
+  "license": "MIT",
+  "author": "Wayne Van Son <waynevanson@gmail.com> (https://waynevanson.com.au)",
   "type": "module",
+  "exports": {
+    "default": "./dist/src/index.js",
+    "types": "./dist/src/index.d.ts"
+  },
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "directories": {
+    "test": "test"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json"
   },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/waynevanson/valibot-cli"
+  "dependencies": {
+    "valibot": "^1.2.0"
   },
-  "author": {
-    "name": "Wayne Van Son",
-    "email": "waynevanson@gmail.com",
-    "url": "https://waynevanson.com.au"
-  },
-  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a",
   "devDependencies": {
     "@types/node": "^24.10.4",
     "fast-check": "^4.5.3",
@@ -30,7 +42,8 @@
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.0.16"
   },
-  "dependencies": {
-    "valibot": "^1.2.0"
-  }
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
 }
