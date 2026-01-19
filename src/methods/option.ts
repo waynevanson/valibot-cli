@@ -1,14 +1,35 @@
 import * as v from "valibot"
-import { ArgOptionMetadata } from "./arg-metadata"
 import { arg } from "./arg-method"
 
 export type OptionSchema = v.StringSchema<
   v.ErrorMessage<v.StringIssue> | undefined
 >
 
+// todo: kebab-case
+const long = v.pipe(v.string())
+const short = v.pipe(v.string(), v.minLength(1), v.maxLength(1))
+
+const shorts = v.object({
+  shorts: v.tupleWithRest([short], short),
+  longs: v.optional(v.array(long), [])
+})
+
+const longs = v.object({
+  shorts: v.optional(v.array(short), []),
+  longs: v.tupleWithRest([long], long)
+})
+
+const OptionOptions = v.intersect([
+  v.object({ name: v.pipe(v.string(), v.minLength(1)) }),
+  v.union([longs, shorts])
+])
+
+export type OptionOptions = v.InferInput<typeof OptionOptions>
+
 export function option<const TSchema extends OptionSchema>(
   schema: TSchema,
-  option: Omit<ArgOptionMetadata, "type">
+  options: OptionOptions
 ) {
-  return arg(schema, { type: "option", ...option })
+  const parsed = v.parse(OptionOptions, options)
+  return arg(schema, { type: "option", ...parsed })
 }

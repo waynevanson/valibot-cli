@@ -8,9 +8,8 @@ describe(c.parse.name, () => {
   describe("string", () => {
     test("should pass a flag with a valsue", () => {
       const schema = c.option(v.string(), {
-        longs: ["greeting"],
-        shorts: [],
-        name: "greeting"
+        name: "greeting",
+        longs: ["greeting"]
       })
       const argv = ["--greeting=hello"]
       const result = c.parse(schema, argv)
@@ -22,9 +21,8 @@ describe(c.parse.name, () => {
     test("should pass a flag with a value", () => {
       const schema = v.strictTuple([
         c.option(v.string(), {
-          longs: ["greeting"],
-          shorts: [],
-          name: "greeting"
+          name: "greeting",
+          longs: ["greeting"]
         })
       ])
       const argv = ["--greeting=hello"]
