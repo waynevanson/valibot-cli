@@ -160,7 +160,9 @@ export class Trailing {
   }
 }
 
-export function createArgsTokens(args: Array<string>): Array<ArgsToken> {
+export function createArgsTokens(
+  args: ReadonlyArray<string>
+): Array<ArgsToken> {
   const trailing = new Trailing()
 
   const argsToken: Array<ArgsToken> = []

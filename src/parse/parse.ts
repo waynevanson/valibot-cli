@@ -32,7 +32,7 @@ export type ParsableSchema =
 
 export function parse<TSchema extends ParsableSchema>(
   schema: TSchema,
-  args: Array<string>
+  args: ReadonlyArray<string>
 ): v.InferInput<TSchema> {
   const unmatches = createUnmatches(schema)
   const tokens = createArgsTokens(args)
