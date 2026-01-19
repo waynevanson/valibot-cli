@@ -1,8 +1,6 @@
-import { describe } from "node:test"
 import * as c from "../src"
-import { test } from "vitest"
+import { describe, test, expect } from "vitest"
 import * as v from "valibot"
-import { expect } from "vitest"
 
 describe(c.parse.name, () => {
   describe("string", () => {
