@@ -3,9 +3,21 @@ import { ArgOptionMetadata, ArgValueMetadata } from "../methods/arg-metadata.js"
 import { Unmatches, UnmatchesNodeString } from "./unmatches.js"
 import * as v from "valibot"
 
-interface MatchesState {
-  matches: Matches
-  previous: undefined | UnmatchesNodeString
+class MatchesState {
+  matches = new Matches()
+  previous: undefined | UnmatchesNodeString = undefined
+
+  // consume the previous match if it existed
+  prev() {
+    if (this.previous === undefined) {
+      return undefined
+    }
+
+    const unmatch = this.previous
+    this.previous = undefined
+
+    return unmatch
+  }
 }
 
 export class Matches extends Map<symbol, Match> {}
@@ -38,10 +50,6 @@ export function createMatches(
       case "option": {
         const unmatch = getNodeForOptionString(unmatches, token)
 
-        if (unmatch === undefined) {
-          throw new Error()
-        }
-
         if (token.value === undefined) {
           if (unmatch.value === "none") {
             throw new Error()
@@ -59,27 +67,12 @@ export function createMatches(
       }
 
       case "value": {
-        if (state.previous === undefined) {
-          // `<value>`
-          const unmatch = getNodeValueForString(unmatches)
+        const unmatch = state.prev() ?? getNodeValueForString(unmatches)
 
-          if (unmatch === undefined) {
-            throw new Error()
-          }
+        const value: MatchValue = { type: "string", value: token.value }
+        const match: Match = { name: unmatch.metadata.name, value }
+        state.matches.set(unmatch.ref, match)
 
-          const value: MatchValue = { type: "string", value: token.value }
-          const match: Match = { name: unmatch.metadata.name, value }
-          state.matches.set(unmatch.ref, match)
-        } else {
-          // `--<identifier> <value>`
-
-          const unmatch = state.previous
-          state.previous = undefined
-
-          const value: MatchValue = { type: "string", value: token.value }
-          const match: Match = { name: unmatch.metadata.name, value }
-          state.matches.set(unmatch.ref, match)
-        }
         break
       }
 
@@ -91,12 +84,9 @@ export function createMatches(
   }
 
   const state = tokens.reduce(
-    (state: MatchesState, token) => walk(state, token),
-    { matches: new Matches(), previous: undefined }
+    (state, token) => walk(state, token),
+    new MatchesState()
   )
-
-  // validate we've iterated through all required values
-  // in unmatches
 
   return state.matches
 }
@@ -130,7 +120,13 @@ export function getNodeValueForString(unmatches: Unmatches) {
     return undefined
   }
 
-  return walk(unmatches)
+  const value = walk(unmatches)
+
+  if (value === undefined) {
+    throw new Error()
+  }
+
+  return value
 }
 
 export function getNodeForOptionString(
@@ -173,5 +169,11 @@ export function getNodeForOptionString(
     return undefined
   }
 
-  return walk(unmatches)
+  const value = walk(unmatches)
+
+  if (value === undefined) {
+    throw new Error()
+  }
+
+  return value
 }
