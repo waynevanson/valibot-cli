@@ -1,6 +1,24 @@
 import * as c from "../src/index.js"
 import { describe, test, expect } from "vitest"
 import * as v from "valibot"
+import { ParsableSchema } from "../src/parse/index.js"
+
+interface Prop<Schema extends ParsableSchema> {
+  schema: Schema
+  argv: Array<string>
+  expected: v.InferInput<Schema>
+}
+
+function property<Schema extends ParsableSchema>(prop: Prop<Schema>) {
+  const parsed = c.parse(prop.schema, prop.argv)
+  expect(parsed).toStrictEqual(prop.expected)
+
+  const validated = v.safeParse(prop.schema, parsed)
+  expect(validated).containSubset({
+    issues: undefined,
+    success: true
+  })
+}
 
 describe(c.parse.name, () => {
   describe("string", () => {
@@ -10,8 +28,9 @@ describe(c.parse.name, () => {
         longs: ["greeting"]
       })
       const argv = ["--greeting=hello"]
-      const result = c.parse(schema, argv)
-      expect(result).toBe("hello")
+      const expected = "hello"
+
+      property({ schema, argv, expected })
     })
   })
 
@@ -24,8 +43,7 @@ describe(c.parse.name, () => {
         })
       ])
       const argv = ["--greeting=hello"]
-      const result = c.parse(schema, argv)
-      expect(result).toStrictEqual(["hello"])
+      property({ argv, expected: ["hello"], schema })
     })
   })
 })
