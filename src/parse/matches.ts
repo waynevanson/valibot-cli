@@ -5,6 +5,7 @@ import * as v from "valibot"
 
 interface MatchesState {
   matches: Matches
+  previous: undefined | UnmatchesNodeString
 }
 
 export class Matches extends Map<symbol, Match> {}
@@ -35,21 +36,40 @@ export function createMatches(
   function walk(state: MatchesState, token: ArgsToken): MatchesState {
     switch (token.type) {
       case "option": {
-        // find node that as a value and a string
-        const unmatch = getNodeForOptionValueString(unmatches, token)
+        const unmatch = getNodeForOptionString(unmatches, token)
 
         if (unmatch === undefined) {
           throw new Error()
         }
 
         if (token.value === undefined) {
-          throw new Error()
+          if (unmatch.value === "none") {
+            throw new Error()
+          }
+
+          state.previous = unmatch
+
+          break
         }
 
         const value: MatchValue = { type: "string", value: token.value }
         const match: Match = { name: unmatch.metadata.name, value }
-
         state.matches.set(unmatch.ref, match)
+        break
+      }
+
+      case "value": {
+        if (state.previous === undefined) {
+          throw new Error()
+        }
+
+        const unmatch = state.previous
+        state.previous = undefined
+
+        const value: MatchValue = { type: "string", value: token.value }
+        const match: Match = { name: unmatch.metadata.name, value }
+        state.matches.set(unmatch.ref, match)
+
         break
       }
 
@@ -62,7 +82,7 @@ export function createMatches(
 
   const state = tokens.reduce(
     (state: MatchesState, token) => walk(state, token),
-    { matches: new Matches() }
+    { matches: new Matches(), previous: undefined }
   )
 
   // validate we've iterated through all required values
@@ -71,7 +91,7 @@ export function createMatches(
   return state.matches
 }
 
-export function getNodeForOptionValueString(
+export function getNodeForOptionString(
   unmatches: Unmatches,
   token: OptionToken
 ) {
@@ -79,7 +99,6 @@ export function getNodeForOptionValueString(
     switch (unmatches.type) {
       case "string": {
         if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
-          console.log("brok")
           break
         }
 

@@ -13,33 +13,57 @@ function property<Schema extends ParsableSchema>(prop: Prop<Schema>) {
   return prop
 }
 
-describe(c.parse.name, () => {
-  test.each([
-    [
-      "string",
-      property({
-        schema: c.option(v.string(), {
+const fixtures = [
+  [
+    "string",
+    property({
+      schema: c.option(v.string(), {
+        name: "greeting",
+        longs: ["greeting"]
+      }),
+      argv: ["--greeting=hello"],
+      expected: "hello"
+    })
+  ],
+  [
+    "string spaced",
+    property({
+      schema: c.option(v.string(), {
+        name: "greeting",
+        longs: ["greeting"]
+      }),
+      argv: ["--greeting", "hello"],
+      expected: "hello"
+    })
+  ],
+  [
+    "string short",
+    property({
+      schema: c.option(v.string(), {
+        name: "greeting",
+        shorts: ["g"]
+      }),
+      argv: ["-g=hello"],
+      expected: "hello"
+    })
+  ],
+  [
+    "strict_tuple string",
+    property({
+      schema: v.strictTuple([
+        c.option(v.string(), {
           name: "greeting",
           longs: ["greeting"]
-        }),
-        argv: ["--greeting=hello"],
-        expected: "hello"
-      })
-    ],
-    [
-      "strict_tuple string",
-      property({
-        schema: v.strictTuple([
-          c.option(v.string(), {
-            name: "greeting",
-            longs: ["greeting"]
-          })
-        ]),
-        argv: ["--greeting=hello"],
-        expected: ["hello"]
-      })
-    ]
-  ])("%s", (_name, prop) => {
+        })
+      ]),
+      argv: ["--greeting=hello"],
+      expected: ["hello"]
+    })
+  ]
+] as const
+
+describe(c.parse.name, () => {
+  test.each(fixtures)("%s", (_name, prop) => {
     // parse = argv + schema
     const parsed = c.parse(prop.schema, prop.argv)
     expect(parsed).toStrictEqual(prop.expected)

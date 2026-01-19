@@ -11,6 +11,7 @@ export type UnmatchesNodeString = {
   ref: symbol
   type: "string"
   metadata: ArgValueMetadata | ArgOptionMetadata
+  value: "none" | "optional" | "required"
 }
 
 export type UnmatchesNodeStructTuple = {
@@ -30,7 +31,7 @@ export function createUnmatches<
     switch (schema.type) {
       case "string": {
         const metadata = getArgMethodMetadata(schema)
-        return { type: schema.type, ref: Symbol(), metadata }
+        return { type: schema.type, ref: Symbol(), value: "required", metadata }
       }
 
       case "strict_tuple": {
