@@ -69,6 +69,18 @@ const fixtures = [
       argv: ["hello"],
       expected: "hello"
     })
+  ],
+  [
+    "strict_tuple string positional",
+    property({
+      schema: v.strictTuple([
+        c.value(v.string(), {
+          name: "greeting"
+        })
+      ]),
+      argv: ["hello"],
+      expected: ["hello"]
+    })
   ]
 ] as const
 
