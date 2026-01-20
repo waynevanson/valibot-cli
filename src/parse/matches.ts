@@ -2,7 +2,6 @@ import { ArgsToken, ArgsTokens, OptionToken, ValueToken } from "./arg-token.js"
 import { ArgOptionMetadata, ArgValueMetadata } from "../methods/arg-metadata.js"
 import { Unmatches, UnmatchesNodeString } from "./unmatches.js"
 import * as v from "valibot"
-import { isBoundInRange } from "../utils/number.js"
 
 // todo: an unmatches structure where I can add existing values to
 class MatchesState {
@@ -73,7 +72,6 @@ export function createMatches(
 
       case "value": {
         const unmatch = state.prev() ?? getNodeValueForString(state, unmatches)
-        console.log(unmatch)
 
         const value: MatchValue = {
           type: "string",

@@ -48,7 +48,7 @@ const fixtures = [
         expected: "hello"
       },
       {
-        argv: ["-q=hello"],
+        argv: ["-q", "hello"],
         expected: "hello"
       }
     ]
