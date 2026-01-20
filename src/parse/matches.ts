@@ -92,12 +92,23 @@ export function createMatches(
       case "value": {
         const unmatch = state.prev() ?? getNodeValueForString(state, unmatches)
 
-        const value: MatchValueString = {
-          type: "string",
-          value: token.value
+        if (unmatch.type === "boolean") {
+          const value = deriveBooleanFromValue(token.value)
+
+          if (value === undefined) {
+            throw new Error()
+          }
+
+          state.matches.set(unmatch.ref, {
+            name: unmatch.metadata.name,
+            value: { type: "boolean", value }
+          })
+        } else {
+          state.matches.set(unmatch.ref, {
+            name: unmatch.metadata.name,
+            value: { type: "string", value: token.value }
+          })
         }
-        const match: Match = { name: unmatch.metadata.name, value }
-        state.matches.set(unmatch.ref, match)
 
         break
       }
