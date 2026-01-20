@@ -58,36 +58,31 @@ export function createMatches(
           // `--<identifier>`
 
           if (unmatch.type === "boolean") {
-            const value: MatchValueBoolean = { type: "boolean", value: true }
-            const match: Match = { name: unmatch.metadata.name, value }
-            state.matches.set(unmatch.ref, match)
+            state.matches.set(unmatch.ref, {
+              name: unmatch.metadata.name,
+              value: { type: "boolean", value: true }
+            })
           } else {
             state.previous = unmatch
           }
         } else {
           // `--<identifier>=<value>`
           if (unmatch.type === "boolean") {
-            const coerced =
-              token.value == "true" || token.value == "1"
-                ? true
-                : token.value == "false" || token.value == "0"
-                  ? false
-                  : undefined
+            const value = deriveBooleanFromValue(token.value)
 
-            if (coerced === undefined) {
+            if (value === undefined) {
               throw new Error()
             }
 
-            const value: MatchValueBoolean = { type: "boolean", value: coerced }
-            const match: Match = { name: unmatch.metadata.name, value }
-            state.matches.set(unmatch.ref, match)
+            state.matches.set(unmatch.ref, {
+              name: unmatch.metadata.name,
+              value: { type: "boolean", value }
+            })
           } else {
-            const value: MatchValueString = {
-              type: "string",
-              value: token.value
-            }
-            const match: Match = { name: unmatch.metadata.name, value }
-            state.matches.set(unmatch.ref, match)
+            state.matches.set(unmatch.ref, {
+              name: unmatch.metadata.name,
+              value: { type: "string", value: token.value }
+            })
           }
         }
 
@@ -243,4 +238,16 @@ export function getNodeForOptionString(
   }
 
   return value
+}
+
+function deriveBooleanFromValue(value: string) {
+  if (value == "true" || value == "1") {
+    return true
+  }
+
+  if (value == "false" || value == "0") {
+    return false
+  }
+
+  return undefined
 }
