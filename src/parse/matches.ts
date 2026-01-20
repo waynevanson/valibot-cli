@@ -92,23 +92,12 @@ export function createMatches(
       case "value": {
         const unmatch = state.prev() ?? getNodeValueForString(state, unmatches)
 
-        if (unmatch.type === "boolean") {
-          const value = deriveBooleanFromValue(token.value)
+        const match = createMatchValue(unmatch, token)
 
-          if (value === undefined) {
-            throw new Error()
-          }
-
-          state.matches.set(unmatch.ref, {
-            name: unmatch.metadata.name,
-            value: { type: "boolean", value }
-          })
-        } else {
-          state.matches.set(unmatch.ref, {
-            name: unmatch.metadata.name,
-            value: { type: "string", value: token.value }
-          })
-        }
+        state.matches.set(unmatch.ref, {
+          name: unmatch.metadata.name,
+          value: match
+        })
 
         break
       }
@@ -126,6 +115,29 @@ export function createMatches(
   )
 
   return state.matches
+}
+
+function createMatchValue(
+  unmatch: UnmatchesNodeString | UnmatchesNodeBoolean,
+  token: ValueToken
+): MatchValue {
+  if (unmatch.type === "boolean") {
+    const value = deriveBooleanFromValue(token.value)
+
+    if (value === undefined) {
+      throw new Error()
+    }
+
+    return {
+      type: "boolean",
+      value
+    }
+  } else {
+    return {
+      type: "string",
+      value: token.value
+    }
+  }
 }
 
 export function getNodeValueForString(
