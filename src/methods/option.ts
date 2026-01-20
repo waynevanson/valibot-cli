@@ -4,6 +4,11 @@ import { arg } from "./arg-method.js"
 export type OptionSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
   | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>
+  | v.ArraySchema<
+      | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+      | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
+      v.ErrorMessage<v.ArrayIssue> | undefined
+    >
 
 // todo: kebab-case
 const long = v.pipe(v.string())

@@ -20,6 +20,7 @@ interface Fixture<Schema extends ParsableSchema> {
 const fixtures = [
   fixture({
     name: "option(string) long shorts aliases",
+
     schema: c.option(v.string(), {
       name: "greeting",
 
@@ -214,9 +215,24 @@ const fixtures = [
         expected: false
       }
     ]
+  }),
+  fixture({
+    name: "option(array(string))",
+    schema: c.option(v.array(v.string()), {
+      name: "features",
+      longs: ["features"],
+      shorts: ["f"]
+    }),
+    cases: [
+      {
+        argv: ["--features=feature-1,feature-2"],
+        expected: ["feature-1", "feature-2"]
+      }
+    ]
   })
 ] satisfies ReadonlyArray<Fixture<ParsableSchema>>
 
+// todo: arrays, default values, objects
 describe(c.parse.name, () => {
   const skippable = fixtures.some((a) => a.only)
   const fixes = fixtures.map(

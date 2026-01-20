@@ -13,14 +13,12 @@ import {
 } from "../arg-token.js"
 import {
   Unmatches,
+  UnmatchesNodeArray,
   UnmatchesNodeBoolean,
   UnmatchesNodeString
 } from "../unmatches.js"
-import { Matches, MatchesState, MatchValue } from "./matches-state.js"
+import { Matches, MatchesState } from "./matches-state.js"
 
-// todo: add more after testing success
-
-// basically add values
 export function createMatches(
   unmatches: Unmatches,
   tokens: ArgsTokens
@@ -33,22 +31,26 @@ export function createMatches(
         if (token.value === undefined) {
           // `--<identifier>`
 
-          if (unmatch.type === "boolean") {
-            state.matches.set(unmatch.ref, {
-              name: unmatch.metadata.name,
-              value: { type: "boolean", value: true }
-            })
+          // todo: booleans where values are optional
+          if (unmatch.type === "boolean" && unmatch.value !== "required") {
+            state.matches.set(unmatch.ref, true)
           } else {
             state.previous = unmatch
           }
         } else {
+          // todo: push a value into the matches
           // `--<identifier>=<value>`
           const match = createMatchValue(unmatch, token)
 
-          state.matches.set(unmatch.ref, {
-            name: unmatch.metadata.name,
-            value: match
-          })
+          if (unmatch.type === "array") {
+            if (typeof match !== "string") {
+              throw new Error()
+            }
+
+            state.matches.append(unmatch.ref, ...match.split(","))
+          } else {
+            state.matches.set(unmatch.ref, match)
+          }
         }
 
         break
@@ -60,10 +62,7 @@ export function createMatches(
 
         const match = createMatchValue(unmatch, token)
 
-        state.matches.set(unmatch.ref, {
-          name: unmatch.metadata.name,
-          value: match
-        })
+        state.matches.set(unmatch.ref, match)
 
         break
       }
@@ -80,13 +79,20 @@ export function createMatches(
     new MatchesState()
   )
 
+  const prev = state.prev()
+
+  if (prev !== undefined) {
+    // no more tokens, resolve the optional flag
+    state.matches.set(prev.ref, true)
+  }
+
   return state.matches
 }
 
 function createMatchValue(
-  unmatch: UnmatchesNodeString | UnmatchesNodeBoolean,
+  unmatch: UnmatchesNodeString | UnmatchesNodeBoolean | UnmatchesNodeArray,
   token: ValueToken | OptionsShortValueToken | OptionLongValueToken
-): MatchValue {
+): string | boolean {
   switch (unmatch.type) {
     case "boolean": {
       const value = deriveBooleanFromValue(token.value)
@@ -95,17 +101,14 @@ function createMatchValue(
         throw new Error()
       }
 
-      return {
-        type: "boolean",
-        value
-      }
+      return value
     }
-    case "string": {
-      return {
-        type: "string",
-        value: token.value
-      }
+
+    case "string":
+    case "array": {
+      return token.value
     }
+
     default: {
       throw new Error()
     }
@@ -122,9 +125,7 @@ export function getNodeValueForString(matches: Matches, unmatches: Unmatches) {
           break
         }
 
-        const match = matches.get(unmatches.ref)
-
-        if (match !== undefined) {
+        if (matches.has(unmatches.ref)) {
           break
         }
 
@@ -172,7 +173,11 @@ export function getNodeForOptionString(
 ) {
   function walk(
     unmatches: Unmatches
-  ): UnmatchesNodeString | UnmatchesNodeBoolean | undefined {
+  ):
+    | UnmatchesNodeString
+    | UnmatchesNodeBoolean
+    | UnmatchesNodeArray
+    | undefined {
     switch (unmatches.type) {
       case "string": {
         if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
@@ -189,6 +194,7 @@ export function getNodeForOptionString(
 
         return unmatches
       }
+
       case "boolean": {
         if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
           break
@@ -213,6 +219,19 @@ export function getNodeForOptionString(
             return unmatch
           }
         }
+        break
+      }
+
+      case "array": {
+        const identifiers = token.short
+          ? unmatches.metadata.shorts
+          : unmatches.metadata.longs
+
+        if (!identifiers.includes(token.identifier)) {
+          break
+        }
+
+        return unmatches
       }
 
       default: {

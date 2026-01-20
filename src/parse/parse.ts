@@ -20,6 +20,7 @@ export type ParsableSchemaPrimitive =
     >
   | ArgMethod<
       v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
+      // todo: ArgValueMetadata
       ArgOptionMetadata
     >
 
@@ -28,6 +29,15 @@ export type ParsableSchema =
   | v.StrictTupleSchema<
       MaybeReadonly<Array<ParsableSchemaPrimitive>>,
       v.ErrorMessage<v.StrictTupleIssue> | undefined
+    >
+  | ArgMethod<
+      v.ArraySchema<
+        | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+        | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
+        v.ErrorMessage<v.ArrayIssue> | undefined
+      >,
+      // todo: ArgValueMetadata
+      ArgOptionMetadata
     >
 
 export function parse<TSchema extends ParsableSchema>(

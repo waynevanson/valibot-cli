@@ -27,10 +27,19 @@ export type UnmatchesNodeStructTuple = {
   type: "strict_tuple"
 }
 
-export type Unmatches =
-  | UnmatchesNodeString
-  | UnmatchesNodeStructTuple
-  | UnmatchesNodeBoolean
+export type UnmatchesNodeArray = {
+  ref: symbol
+  item: UnmatchesNodeArrayItem
+  type: "array"
+  metadata: ArgOptionMetadata
+}
+
+export type UnmatchesNodeArrayItem = { type: "string" } | { type: "boolean" }
+
+export type UnmatchesBranch = UnmatchesNodeStructTuple | UnmatchesNodeArray
+export type UnmatchesLeaf = UnmatchesNodeString | UnmatchesNodeBoolean
+
+export type Unmatches = UnmatchesBranch | UnmatchesLeaf
 
 export function createUnmatches<Schema extends ParsableSchema>(
   schema: Schema
@@ -50,6 +59,19 @@ export function createUnmatches<Schema extends ParsableSchema>(
       case "strict_tuple": {
         const items = schema.items.map((item) => walk(item as never))
         return { type: schema.type, ref: Symbol(), items }
+      }
+
+      case "array": {
+        // do I need to get the string?
+        const metadata = getArgMethodMetadata(schema)
+        return {
+          type: "array",
+          item: {
+            type: schema.item.type
+          },
+          ref: Symbol(),
+          metadata
+        }
       }
 
       default: {
