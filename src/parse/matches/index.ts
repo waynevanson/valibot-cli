@@ -55,7 +55,8 @@ export function createMatches(
       }
 
       case "value": {
-        const unmatch = state.prev() ?? getNodeValueForString(state, unmatches)
+        const unmatch =
+          state.prev() ?? getNodeValueForString(state.matches, unmatches)
 
         const match = createMatchValue(unmatch, token)
 
@@ -111,10 +112,7 @@ function createMatchValue(
   }
 }
 
-export function getNodeValueForString(
-  state: MatchesState,
-  unmatches: Unmatches
-) {
+export function getNodeValueForString(matches: Matches, unmatches: Unmatches) {
   function walk(
     unmatches: Unmatches
   ): UnmatchesNodeString | UnmatchesNodeBoolean | undefined {
@@ -124,7 +122,7 @@ export function getNodeValueForString(
           break
         }
 
-        const match = state.matches.get(unmatches.ref)
+        const match = matches.get(unmatches.ref)
 
         if (match !== undefined) {
           break
