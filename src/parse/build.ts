@@ -1,4 +1,4 @@
-import { Matches } from "./matches.js"
+import { Matches } from "./matches/index.js"
 import { Unmatches } from "./unmatches.js"
 
 export type BuildOutput = Array<BuildOutput> | string | boolean

@@ -6,7 +6,7 @@ import {
 } from "../methods/index.js"
 import { createArgsTokens } from "./arg-token.js"
 import { build } from "./build.js"
-import { createMatches } from "./matches.js"
+import { createMatches } from "./matches/index.js"
 import { createUnmatches } from "./unmatches.js"
 import { MaybeReadonly } from "../utils/index.js"
 

@@ -1,48 +1,24 @@
-import { ArgsToken, ArgsTokens, OptionToken, ValueToken } from "./arg-token.js"
-import { ArgOptionMetadata, ArgValueMetadata } from "../methods/arg-metadata.js"
+import * as v from "valibot"
+import {
+  ArgOptionMetadata,
+  ArgValueMetadata
+} from "../../methods/arg-metadata.js"
+import {
+  ArgsToken,
+  ArgsTokens,
+  OptionLongValueToken,
+  OptionsShortValueToken,
+  OptionToken,
+  ValueToken
+} from "../arg-token.js"
 import {
   Unmatches,
   UnmatchesNodeBoolean,
   UnmatchesNodeString
-} from "./unmatches.js"
-import * as v from "valibot"
-
-class MatchesState {
-  matches = new Matches()
-  previous: undefined | UnmatchesNodeString | UnmatchesNodeBoolean = undefined
-
-  // consume the previous match if it existed
-  prev() {
-    if (this.previous === undefined) {
-      return undefined
-    }
-
-    const unmatch = this.previous
-    this.previous = undefined
-
-    return unmatch
-  }
-}
-
-export class Matches extends Map<symbol, Match> {}
-
-export type Match = {
-  name: string
-  value: MatchValue
-}
+} from "../unmatches.js"
+import { Matches, MatchesState, MatchValue } from "./matches-state.js"
 
 // todo: add more after testing success
-export type MatchValue = MatchValueString | MatchValueBoolean
-
-export type MatchValueString = {
-  type: "string"
-  value: string
-}
-
-export type MatchValueBoolean = {
-  type: "boolean"
-  value: boolean | undefined
-}
 
 // basically add values
 export function createMatches(
@@ -67,23 +43,12 @@ export function createMatches(
           }
         } else {
           // `--<identifier>=<value>`
-          if (unmatch.type === "boolean") {
-            const value = deriveBooleanFromValue(token.value)
+          const match = createMatchValue(unmatch, token)
 
-            if (value === undefined) {
-              throw new Error()
-            }
-
-            state.matches.set(unmatch.ref, {
-              name: unmatch.metadata.name,
-              value: { type: "boolean", value }
-            })
-          } else {
-            state.matches.set(unmatch.ref, {
-              name: unmatch.metadata.name,
-              value: { type: "string", value: token.value }
-            })
-          }
+          state.matches.set(unmatch.ref, {
+            name: unmatch.metadata.name,
+            value: match
+          })
         }
 
         break
@@ -119,7 +84,7 @@ export function createMatches(
 
 function createMatchValue(
   unmatch: UnmatchesNodeString | UnmatchesNodeBoolean,
-  token: ValueToken
+  token: ValueToken | OptionsShortValueToken | OptionLongValueToken
 ): MatchValue {
   switch (unmatch.type) {
     case "boolean": {
