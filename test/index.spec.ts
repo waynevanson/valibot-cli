@@ -18,6 +18,41 @@ interface Fixture<Schema extends ParsableSchema> {
 
 const fixtures = [
   fixture({
+    name: "option(string) long shorts aliases",
+    schema: c.option(v.string(), {
+      name: "greeting",
+
+      longs: ["greeting", "quote"],
+      shorts: ["g", "q"]
+    }),
+    cases: [
+      {
+        argv: ["--greeting=hello"],
+        expected: "hello"
+      },
+      {
+        argv: ["--greeting", "hello"],
+        expected: "hello"
+      },
+      {
+        argv: ["--quote=hello"],
+        expected: "hello"
+      },
+      {
+        argv: ["--quote", "hello"],
+        expected: "hello"
+      },
+      {
+        argv: ["-q=hello"],
+        expected: "hello"
+      },
+      {
+        argv: ["-q=hello"],
+        expected: "hello"
+      }
+    ]
+  }),
+  fixture({
     name: "option(string) long",
     schema: c.option(v.string(), {
       name: "greeting",
