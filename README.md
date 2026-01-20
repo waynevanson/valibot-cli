@@ -15,7 +15,7 @@ import * as fs from 'node:fs'
 // describe using valibot where possible,
 // extend cli specific options using metadata
 const schema = v.strictObject({
-    config: c.flag(v.optional(v.string(), "./config.json"), {
+    config: c.option(v.optional(v.string(), "./config.json"), {
         name: "config",
         longs: ["config"],
         shorts: ["c"]
@@ -40,13 +40,12 @@ const schema = v.strictObject({
 
 function main(){
     // Creates a valid input (not the output type) to the schema.
-    const input = c.createInput(schema, process.argv.slice(2))
+    const input = c.parse(schema, process.argv.slice(2))
 
     // Whatever you like, probably applying the schema validation
     const args = v.parse(schema, input)
 
     // Application logic here
-
     const config = JSON.parse(fs.readFileSync(args.config))
 
     switch (args.operation.type) {
