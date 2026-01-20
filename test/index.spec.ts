@@ -170,7 +170,7 @@ const fixtures = [
     ]
   }),
   fixture({
-    name: "",
+    name: "option(boolean) flag",
     schema: c.option(v.boolean(), {
       name: "force",
       longs: ["force"],
@@ -179,6 +179,36 @@ const fixtures = [
     cases: [
       {
         argv: ["--force"],
+        expected: true
+      },
+      {
+        argv: ["--force=true"],
+        expected: true
+      },
+      {
+        argv: ["--force=false"],
+        expected: false
+      }
+      // {
+      //   argv: ["--force", "true"],
+      //   expected: true
+      // }
+      // {
+      //   argv: ["--force", "false"],
+      //   expected: false
+      // }
+    ]
+  }),
+  fixture({
+    name: "option(boolean) flag with value",
+    schema: c.option(v.boolean(), {
+      name: "force",
+      longs: ["force"],
+      shorts: ["f"]
+    }),
+    cases: [
+      {
+        argv: ["--force=true"],
         expected: true
       }
     ]

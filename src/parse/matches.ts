@@ -66,13 +66,29 @@ export function createMatches(
           }
         } else {
           // `--<identifier>=<value>`
+          if (unmatch.type === "boolean") {
+            const coerced =
+              token.value == "true" || token.value == "1"
+                ? true
+                : token.value == "false" || token.value == "0"
+                  ? false
+                  : undefined
 
-          const value: MatchValueString = {
-            type: "string",
-            value: token.value
+            if (coerced === undefined) {
+              throw new Error()
+            }
+
+            const value: MatchValueBoolean = { type: "boolean", value: coerced }
+            const match: Match = { name: unmatch.metadata.name, value }
+            state.matches.set(unmatch.ref, match)
+          } else {
+            const value: MatchValueString = {
+              type: "string",
+              value: token.value
+            }
+            const match: Match = { name: unmatch.metadata.name, value }
+            state.matches.set(unmatch.ref, match)
           }
-          const match: Match = { name: unmatch.metadata.name, value }
-          state.matches.set(unmatch.ref, match)
         }
 
         break

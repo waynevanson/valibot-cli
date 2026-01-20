@@ -6,6 +6,10 @@ Inspired from the derive API in rust's `clap` crate.
 
 ## Quickstart
 
+```sh
+npm install @waynevanson/valibot-cli
+```
+
 ```ts
 // Read file with a given config
 import * as v from "valibot"
