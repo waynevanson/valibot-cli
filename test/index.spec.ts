@@ -134,6 +134,40 @@ const fixtures = [
         expected: ["hello", "jayson"]
       }
     ]
+  }),
+  fixture({
+    name: "strict_tuple([value(string), option(string)]) positional",
+    schema: v.strictTuple([
+      c.value(v.string(), {
+        name: "greeting"
+      }),
+      c.option(v.string(), {
+        name: "user",
+        longs: ["user", "person"]
+      })
+    ]),
+    cases: [
+      {
+        argv: ["hello", "--user", "jayson"],
+        expected: ["hello", "jayson"]
+      },
+      {
+        argv: ["hello", "--user=jayson"],
+        expected: ["hello", "jayson"]
+      },
+      {
+        argv: ["hello", "--person=jayson"],
+        expected: ["hello", "jayson"]
+      },
+      {
+        argv: ["--person=jayson", "hello"],
+        expected: ["hello", "jayson"]
+      },
+      {
+        argv: ["--person", "jayson", "hello"],
+        expected: ["hello", "jayson"]
+      }
+    ]
   })
 ] satisfies ReadonlyArray<Fixture<ParsableSchema>>
 
