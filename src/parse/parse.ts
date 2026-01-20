@@ -13,20 +13,20 @@ import { MaybeReadonly } from "../utils/index.js"
 // at the start we allow all args
 // but we eventually it gets narrowed down
 
-export type ParsableSchema =
+export type ParsableSchemaPrimitive =
   | ArgMethod<
       v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
       ArgOptionMetadata | ArgValueMetadata
     >
+  | ArgMethod<
+      v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
+      ArgOptionMetadata
+    >
+
+export type ParsableSchema =
+  | ParsableSchemaPrimitive
   | v.StrictTupleSchema<
-      MaybeReadonly<
-        Array<
-          ArgMethod<
-            v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
-            ArgOptionMetadata | ArgValueMetadata
-          >
-        >
-      >,
+      MaybeReadonly<Array<ParsableSchemaPrimitive>>,
       v.ErrorMessage<v.StrictTupleIssue> | undefined
     >
 

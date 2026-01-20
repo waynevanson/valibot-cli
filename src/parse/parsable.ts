@@ -10,6 +10,11 @@ export type ParsableSchemaString = ArgMethod<
   ArgValueMetadata | ArgOptionMetadata
 >
 
+export type ParsableSchemaBoolean = ArgMethod<
+  v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+  ArgValueMetadata | ArgOptionMetadata
+>
+
 export interface ParsableSchemaStrictTuple<
   TupleItems extends v.TupleItems
 > extends v.StrictTupleSchema<
@@ -17,8 +22,10 @@ export interface ParsableSchemaStrictTuple<
   v.ErrorMessage<v.StrictTupleIssue> | undefined
 > {}
 
-export type ParsableSchemaPrimitive = ParsableSchemaString
+export type ParsableSchemaPrimitive =
+  | ParsableSchemaString
+  | ParsableSchemaBoolean
 
 export type ParsableSchema<TupleItems extends v.TupleItems> =
-  | ParsableSchemaString
+  | ParsableSchemaPrimitive
   | ParsableSchemaStrictTuple<TupleItems>

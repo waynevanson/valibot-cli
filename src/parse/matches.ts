@@ -1,12 +1,15 @@
 import { ArgsToken, ArgsTokens, OptionToken, ValueToken } from "./arg-token.js"
 import { ArgOptionMetadata, ArgValueMetadata } from "../methods/arg-metadata.js"
-import { Unmatches, UnmatchesNodeString } from "./unmatches.js"
+import {
+  Unmatches,
+  UnmatchesNodeBoolean,
+  UnmatchesNodeString
+} from "./unmatches.js"
 import * as v from "valibot"
 
-// todo: an unmatches structure where I can add existing values to
 class MatchesState {
   matches = new Matches()
-  previous: undefined | UnmatchesNodeString = undefined
+  previous: undefined | UnmatchesNodeString | UnmatchesNodeBoolean = undefined
 
   // consume the previous match if it existed
   prev() {
@@ -29,7 +32,7 @@ export type Match = {
 }
 
 // todo: add more after testing success
-export type MatchValue = MatchValueString
+export type MatchValue = MatchValueString | MatchValueBoolean
 
 export type MatchValueString = {
   type: "string"
@@ -52,28 +55,33 @@ export function createMatches(
         const unmatch = getNodeForOptionString(unmatches, token)
 
         if (token.value === undefined) {
-          if (unmatch.value === "none") {
-            throw new Error()
+          // `--<identifier>`
+
+          if (unmatch.type === "boolean") {
+            const value: MatchValueBoolean = { type: "boolean", value: true }
+            const match: Match = { name: unmatch.metadata.name, value }
+            state.matches.set(unmatch.ref, match)
+          } else {
+            state.previous = unmatch
           }
+        } else {
+          // `--<identifier>=<value>`
 
-          state.previous = unmatch
-
-          break
+          const value: MatchValueString = {
+            type: "string",
+            value: token.value
+          }
+          const match: Match = { name: unmatch.metadata.name, value }
+          state.matches.set(unmatch.ref, match)
         }
 
-        const value: MatchValue = {
-          type: "string",
-          value: token.value
-        }
-        const match: Match = { name: unmatch.metadata.name, value }
-        state.matches.set(unmatch.ref, match)
         break
       }
 
       case "value": {
         const unmatch = state.prev() ?? getNodeValueForString(state, unmatches)
 
-        const value: MatchValue = {
+        const value: MatchValueString = {
           type: "string",
           value: token.value
         }
@@ -102,7 +110,9 @@ export function getNodeValueForString(
   state: MatchesState,
   unmatches: Unmatches
 ) {
-  function walk(unmatches: Unmatches): UnmatchesNodeString | undefined {
+  function walk(
+    unmatches: Unmatches
+  ): UnmatchesNodeString | UnmatchesNodeBoolean | undefined {
     switch (unmatches.type) {
       case "string": {
         if (!v.is(ArgValueMetadata, unmatches.metadata)) {
@@ -112,6 +122,14 @@ export function getNodeValueForString(
         const match = state.matches.get(unmatches.ref)
 
         if (match !== undefined) {
+          break
+        }
+
+        return unmatches
+      }
+
+      case "boolean": {
+        if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
           break
         }
 
@@ -149,9 +167,26 @@ export function getNodeForOptionString(
   unmatches: Unmatches,
   token: OptionToken
 ) {
-  function walk(unmatches: Unmatches): UnmatchesNodeString | undefined {
+  function walk(
+    unmatches: Unmatches
+  ): UnmatchesNodeString | UnmatchesNodeBoolean | undefined {
     switch (unmatches.type) {
       case "string": {
+        if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
+          break
+        }
+
+        const identifiers = token.short
+          ? unmatches.metadata.shorts
+          : unmatches.metadata.longs
+
+        if (!identifiers.includes(token.identifier)) {
+          break
+        }
+
+        return unmatches
+      }
+      case "boolean": {
         if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
           break
         }

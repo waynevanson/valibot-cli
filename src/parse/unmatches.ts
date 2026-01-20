@@ -5,13 +5,20 @@ import {
   getArgMethodMetadata
 } from "../methods/index.js"
 import { MaybeReadonly } from "../utils/index.js"
-import { ParsableSchema } from "./parsable.js"
+import { ParsableSchema } from "./parse.js"
 
 export type UnmatchesNodeString = {
   ref: symbol
   type: "string"
   metadata: ArgValueMetadata | ArgOptionMetadata
-  value: "none" | "optional" | "required"
+  value: "optional" | "required"
+}
+
+export type UnmatchesNodeBoolean = {
+  ref: symbol
+  type: "boolean"
+  metadata: ArgOptionMetadata
+  value: "required" | "optional"
 }
 
 export type UnmatchesNodeStructTuple = {
@@ -20,16 +27,22 @@ export type UnmatchesNodeStructTuple = {
   type: "strict_tuple"
 }
 
-export type Unmatches = UnmatchesNodeString | UnmatchesNodeStructTuple
+export type Unmatches =
+  | UnmatchesNodeString
+  | UnmatchesNodeStructTuple
+  | UnmatchesNodeBoolean
 
-export function createUnmatches<
-  Schema extends ParsableSchema<MaybeReadonly<Array<v.GenericSchema>>>
->(schema: Schema): Unmatches {
-  function walk(
-    schema: ParsableSchema<MaybeReadonly<Array<v.GenericSchema>>>
-  ): Unmatches {
+export function createUnmatches<Schema extends ParsableSchema>(
+  schema: Schema
+): Unmatches {
+  function walk(schema: ParsableSchema): Unmatches {
     switch (schema.type) {
       case "string": {
+        const metadata = getArgMethodMetadata(schema)
+        return { type: schema.type, ref: Symbol(), value: "required", metadata }
+      }
+
+      case "boolean": {
         const metadata = getArgMethodMetadata(schema)
         return { type: schema.type, ref: Symbol(), value: "required", metadata }
       }

@@ -168,6 +168,20 @@ const fixtures = [
         expected: ["hello", "jayson"]
       }
     ]
+  }),
+  fixture({
+    name: "",
+    schema: c.option(v.boolean(), {
+      name: "force",
+      longs: ["force"],
+      shorts: ["f"]
+    }),
+    cases: [
+      {
+        argv: ["--force"],
+        expected: true
+      }
+    ]
   })
 ] satisfies ReadonlyArray<Fixture<ParsableSchema>>
 

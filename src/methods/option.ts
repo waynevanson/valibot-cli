@@ -1,9 +1,9 @@
 import * as v from "valibot"
 import { arg } from "./arg-method.js"
 
-export type OptionSchema = v.StringSchema<
-  v.ErrorMessage<v.StringIssue> | undefined
->
+export type OptionSchema =
+  | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
+  | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>
 
 // todo: kebab-case
 const long = v.pipe(v.string())
