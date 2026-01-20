@@ -188,6 +188,14 @@ const fixtures = [
       {
         argv: ["--force=false"],
         expected: false
+      },
+      {
+        argv: ["--force=1"],
+        expected: true
+      },
+      {
+        argv: ["--force=0"],
+        expected: false
       }
       // {
       //   argv: ["--force", "true"],
