@@ -2,7 +2,9 @@ import { ArgsToken, ArgsTokens, OptionToken, ValueToken } from "./arg-token.js"
 import { ArgOptionMetadata, ArgValueMetadata } from "../methods/arg-metadata.js"
 import { Unmatches, UnmatchesNodeString } from "./unmatches.js"
 import * as v from "valibot"
+import { isBoundInRange } from "../utils/number.js"
 
+// todo: an unmatches structure where I can add existing values to
 class MatchesState {
   matches = new Matches()
   previous: undefined | UnmatchesNodeString = undefined
@@ -60,16 +62,23 @@ export function createMatches(
           break
         }
 
-        const value: MatchValue = { type: "string", value: token.value }
+        const value: MatchValue = {
+          type: "string",
+          value: token.value
+        }
         const match: Match = { name: unmatch.metadata.name, value }
         state.matches.set(unmatch.ref, match)
         break
       }
 
       case "value": {
-        const unmatch = state.prev() ?? getNodeValueForString(unmatches)
+        const unmatch = state.prev() ?? getNodeValueForString(state, unmatches)
+        console.log(unmatch)
 
-        const value: MatchValue = { type: "string", value: token.value }
+        const value: MatchValue = {
+          type: "string",
+          value: token.value
+        }
         const match: Match = { name: unmatch.metadata.name, value }
         state.matches.set(unmatch.ref, match)
 
@@ -91,11 +100,20 @@ export function createMatches(
   return state.matches
 }
 
-export function getNodeValueForString(unmatches: Unmatches) {
+export function getNodeValueForString(
+  state: MatchesState,
+  unmatches: Unmatches
+) {
   function walk(unmatches: Unmatches): UnmatchesNodeString | undefined {
     switch (unmatches.type) {
       case "string": {
         if (!v.is(ArgValueMetadata, unmatches.metadata)) {
+          break
+        }
+
+        const match = state.matches.get(unmatches.ref)
+
+        if (match !== undefined) {
           break
         }
 
