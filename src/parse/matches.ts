@@ -121,21 +121,27 @@ function createMatchValue(
   unmatch: UnmatchesNodeString | UnmatchesNodeBoolean,
   token: ValueToken
 ): MatchValue {
-  if (unmatch.type === "boolean") {
-    const value = deriveBooleanFromValue(token.value)
+  switch (unmatch.type) {
+    case "boolean": {
+      const value = deriveBooleanFromValue(token.value)
 
-    if (value === undefined) {
+      if (value === undefined) {
+        throw new Error()
+      }
+
+      return {
+        type: "boolean",
+        value
+      }
+    }
+    case "string": {
+      return {
+        type: "string",
+        value: token.value
+      }
+    }
+    default: {
       throw new Error()
-    }
-
-    return {
-      type: "boolean",
-      value
-    }
-  } else {
-    return {
-      type: "string",
-      value: token.value
     }
   }
 }
