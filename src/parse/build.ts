@@ -8,19 +8,19 @@ export function build(
   unmatches: Unmatches<ParsableSchema>,
   matches: Matches,
 ): BuildOutput {
-  function walk(unmatches: Unmatch) {
-    switch (unmatches.type) {
+  function walk(unmatch: Unmatch) {
+    switch (unmatch.type) {
       case "string":
       case "boolean":
       case "array": {
-        return matches.getByType(unmatches.ref, unmatches.type);
+        return matches.getByType(unmatch.ref, unmatch.type);
       }
 
       case "strict_tuple": {
         const tuple: BuildOutput = [];
 
-        for (const unmatch of unmatches.items) {
-          const match = walk(unmatch);
+        for (const item of unmatch.items) {
+          const match = walk(item);
           tuple.push(match);
         }
 
