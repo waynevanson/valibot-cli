@@ -4,7 +4,7 @@ import type { ArgsToken, OptionToken, ValueToken } from "../tokens/index.js";
 import type { Unmatches, UnmatchLeaf } from "../unmatches.js";
 import { getMatchForValue } from "./match.js";
 import type { Matches } from "./matches.js";
-import { getUnmatchForOption, getUnmatchForValue } from "./unmatch.js";
+import { isUnmatchForOption, isUnmatchForValue } from "./unmatch.js";
 
 export type Matched =
   | { type: "previous"; unmatch: UnmatchLeaf }
@@ -38,7 +38,9 @@ export function getMatchedForOption(
   token: OptionToken,
   inputs: GetMatchedInputs,
 ): Matched {
-  const unmatch = getUnmatchForOption(inputs.unmatches, token);
+  const unmatch = inputs.unmatches.find((leaf) =>
+    isUnmatchForOption(leaf, token),
+  );
 
   // `--<identifier>=<value>`
   if (token.value !== undefined) {
@@ -75,7 +77,7 @@ export function getMatchedForValue(
 ): Matched {
   const unmatch =
     inputs.previous.get() ??
-    getUnmatchForValue(inputs.matches, inputs.unmatches);
+    inputs.unmatches.find((leaf) => isUnmatchForValue(leaf, inputs.matches));
 
   const match = getMatchForValue(unmatch, token);
 

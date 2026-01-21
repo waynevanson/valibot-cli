@@ -6,53 +6,57 @@ import { type GetMatchedInputs, getMatched } from "./matched.js";
 
 export type Match = string | boolean | Array<string>;
 
-export class Matches {
-  map = new Map<symbol, Match>();
+export function collectMatches(
+  matches: Matches,
+  unmatches: Unmatches<ParsableSchema>,
+  tokens: ArgsTokens,
+) {
+  const previous = new Only<UnmatchLeaf>();
 
-  constructor(unmatches: Unmatches<ParsableSchema>, tokens: ArgsTokens) {
-    const previous = new Only<UnmatchLeaf>();
+  const inputs: GetMatchedInputs = {
+    matches,
+    previous,
+    unmatches,
+  };
 
-    const inputs: GetMatchedInputs = {
-      matches: this,
-      previous,
-      unmatches,
-    };
+  for (const token of tokens) {
+    const matched = getMatched(token, inputs);
 
-    for (const token of tokens) {
-      const matched = getMatched(token, inputs);
-
-      switch (matched.type) {
-        case "previous": {
-          previous.set(matched.unmatch);
-          break;
-        }
-
-        case "matched": {
-          this.add(matched.unmatch, matched.match);
-          break;
-        }
-
-        default: {
-          throw new Error();
-        }
+    switch (matched.type) {
+      case "previous": {
+        previous.set(matched.unmatch);
+        break;
       }
-    }
 
-    // resolve the flag as a boolean if we had one
-    const unmatch = previous.get();
+      case "matched": {
+        matches.add(matched.unmatch, matched.match);
+        break;
+      }
 
-    if (unmatch !== undefined) {
-      this.set(unmatch.ref, true);
+      default: {
+        throw new Error();
+      }
     }
   }
 
+  // resolve the flag as a boolean if we had one
+  const unmatch = previous.get();
+
+  if (unmatch !== undefined) {
+    matches.set(unmatch.ref, true);
+  }
+}
+
+export class Matches {
+  #map = new Map<symbol, Match>();
+
   get(ref: symbol) {
-    if (!this.map.has(ref)) {
+    if (!this.#map.has(ref)) {
       throw new Error();
     }
 
     // biome-ignore lint/style/noNonNullAssertion: Asserted above
-    const value = this.map.get(ref)!;
+    const value = this.#map.get(ref)!;
 
     return value;
   }
@@ -81,15 +85,15 @@ export class Matches {
   }
 
   has(ref: symbol) {
-    return this.map.has(ref);
+    return this.#map.has(ref);
   }
 
   set(ref: symbol, value: string | boolean) {
-    if (this.map.has(ref)) {
+    if (this.#map.has(ref)) {
       throw new Error();
     }
 
-    return this.map.set(ref, value);
+    return this.#map.set(ref, value);
   }
 
   append(ref: symbol, ...values: Array<string>) {
@@ -97,11 +101,11 @@ export class Matches {
       throw new Error();
     }
 
-    if (!this.map.has(ref)) {
-      return this.map.set(ref, values);
+    if (!this.#map.has(ref)) {
+      return this.#map.set(ref, values);
     }
 
-    const existing = this.map.get(ref);
+    const existing = this.#map.get(ref);
 
     if (!Array.isArray(existing)) {
       throw new Error();
