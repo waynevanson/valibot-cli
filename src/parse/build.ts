@@ -1,4 +1,4 @@
-import type { Matches } from "./matches/matches-state.js";
+import type { Matches } from "./matches/index.js";
 import type { Unmatches } from "./unmatches.js";
 
 export type BuildOutput = Array<BuildOutput> | string | boolean;

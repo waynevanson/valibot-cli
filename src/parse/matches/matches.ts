@@ -1,9 +1,49 @@
-import type { UnmatchesLeaf } from "../unmatches.js";
+import { match } from "assert";
+import { type } from "os";
+import { ref } from "process";
+import { symbol, set, value, string, boolean, values } from "valibot";
+import { Only } from "../../utils/only.js";
+import { ArgsTokens } from "../tokens/args.js";
+import type { Unmatches, UnmatchesLeaf } from "../unmatches.js";
+import { GetMatchedInputs, getMatched } from "./matched.js";
 
 export type Match = string | boolean | Array<string>;
 
 export class Matches {
   map = new Map<symbol, Match>();
+
+  constructor(unmatches: Unmatches, tokens: ArgsTokens) {
+    const previous = new Only<UnmatchesLeaf>();
+
+    const inputs: GetMatchedInputs = { matches: this, previous, unmatches };
+
+    for (const token of tokens) {
+      const matched = getMatched(token, inputs);
+
+      switch (matched.type) {
+        case "previous": {
+          previous.set(matched.unmatch);
+          break;
+        }
+
+        case "matched": {
+          this.add(matched.unmatch, matched.match);
+          break;
+        }
+
+        default: {
+          throw new Error();
+        }
+      }
+    }
+
+    // resolve the flag as a boolean if we had one
+    const unmatch = previous.get();
+
+    if (unmatch !== undefined) {
+      this.set(unmatch.ref, true);
+    }
+  }
 
   getByType(ref: symbol, type: UnmatchesLeaf["type"]) {
     if (!this.map.has(ref)) {

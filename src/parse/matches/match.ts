@@ -2,7 +2,7 @@ import type {
   OptionLongValueToken,
   OptionsShortValueToken,
   ValueToken,
-} from "../tokens/args.js";
+} from "../tokens/index.js";
 import type {
   UnmatchesNodeArray,
   UnmatchesNodeBoolean,

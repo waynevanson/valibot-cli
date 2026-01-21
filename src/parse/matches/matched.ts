@@ -1,5 +1,5 @@
 import type { Only } from "../../utils/only.js";
-import type { ArgsToken, OptionToken, ValueToken } from "../tokens/args.js";
+import type { ArgsToken, OptionToken, ValueToken } from "../tokens/index.js";
 import type { Unmatches, UnmatchesLeaf } from "../unmatches.js";
 import { getMatchForValue } from "./match.js";
 import type { Matches } from "./matches.js";

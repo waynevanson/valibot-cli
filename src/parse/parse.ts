@@ -6,7 +6,7 @@ import type {
 } from "../methods/index.js";
 import type { MaybeReadonly } from "../utils/index.js";
 import { build } from "./build.js";
-import { createMatches } from "./matches/index.js";
+import { Matches } from "./matches/index.js";
 import { createArgsTokens } from "./tokens/args.js";
 import { createUnmatches } from "./unmatches.js";
 
@@ -46,7 +46,7 @@ export function parse<TSchema extends ParsableSchema>(
 ): v.InferInput<TSchema> {
   const unmatches = createUnmatches(schema);
   const tokens = createArgsTokens(args);
-  const matches = createMatches(unmatches, tokens);
+  const matches = new Matches(unmatches, tokens);
   const input = build(unmatches, matches);
   return input as never;
 }
