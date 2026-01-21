@@ -2,7 +2,6 @@ import * as v from "valibot";
 import { objectWithoutRestUndefined, tuple } from "../../utils/index.js";
 
 export type ArgToken = OptionToken | PrevaluesToken | ValueToken;
-export type ArgTokens = Array<ArgToken>;
 
 export type OptionToken =
   | OptionLongValueToken
