@@ -6,47 +6,44 @@ import {
 import type { MaybeReadonly } from "../utils/index.js";
 import type { ParsableSchema } from "./parse.js";
 
-export type UnmatchesNodeString = {
+export type UnmatchString = {
   ref: symbol;
   type: "string";
   metadata: ArgValueMetadata | ArgOptionMetadata;
   value: "optional" | "required";
 };
 
-export type UnmatchesNodeBoolean = {
+export type UnmatchBoolean = {
   ref: symbol;
   type: "boolean";
   metadata: ArgOptionMetadata;
   value: "required" | "optional";
 };
 
-export type UnmatchesNodeStructTuple = {
+export type UnmatchStrictTuple = {
   ref: symbol;
-  items: MaybeReadonly<Array<Unmatches>>;
+  items: MaybeReadonly<Array<Unmatch>>;
   type: "strict_tuple";
 };
 
-export type UnmatchesNodeArray = {
+export type UnmatchArray = {
   ref: symbol;
-  item: UnmatchesNodeArrayItem;
+  item: UnmatchArrayItem;
   type: "array";
   metadata: ArgOptionMetadata;
 };
 
-export type UnmatchesNodeArrayItem = { type: "string" } | { type: "boolean" };
+export type UnmatchArrayItem = { type: "string" } | { type: "boolean" };
 
-export type UnmatchesBranch = UnmatchesNodeStructTuple;
-export type UnmatchesLeaf =
-  | UnmatchesNodeString
-  | UnmatchesNodeBoolean
-  | UnmatchesNodeArray;
+export type UunmatchBranch = UnmatchStrictTuple;
+export type UnmatchLeaf = UnmatchString | UnmatchBoolean | UnmatchArray;
 
-export type Unmatches = UnmatchesBranch | UnmatchesLeaf;
+export type Unmatch = UunmatchBranch | UnmatchLeaf;
 
 export function createUnmatches<Schema extends ParsableSchema>(
   schema: Schema,
-): Unmatches {
-  function walk(schema: ParsableSchema): Unmatches {
+): Unmatch {
+  function walk(schema: ParsableSchema): Unmatch {
     const ref = Symbol();
 
     switch (schema.type) {
@@ -88,10 +85,10 @@ export function createUnmatches<Schema extends ParsableSchema>(
 }
 
 export function find(
-  unmatches: Unmatches,
-  predicate: (leaf: UnmatchesLeaf) => boolean,
-): UnmatchesLeaf {
-  function walk(unmatches: Unmatches): UnmatchesLeaf | undefined {
+  unmatches: Unmatch,
+  predicate: (leaf: UnmatchLeaf) => boolean,
+): UnmatchLeaf {
+  function walk(unmatches: Unmatch): UnmatchLeaf | undefined {
     switch (unmatches.type) {
       case "array":
       case "string":

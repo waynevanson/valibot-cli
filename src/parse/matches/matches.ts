@@ -1,6 +1,6 @@
 import { Only } from "../../utils/only.js";
 import type { ArgsTokens } from "../tokens/args.js";
-import type { Unmatches, UnmatchesLeaf } from "../unmatches.js";
+import type { Unmatch, UnmatchLeaf } from "../unmatches.js";
 import { type GetMatchedInputs, getMatched } from "./matched.js";
 
 export type Match = string | boolean | Array<string>;
@@ -8,8 +8,8 @@ export type Match = string | boolean | Array<string>;
 export class Matches {
   map = new Map<symbol, Match>();
 
-  constructor(unmatches: Unmatches, tokens: ArgsTokens) {
-    const previous = new Only<UnmatchesLeaf>();
+  constructor(unmatches: Unmatch, tokens: ArgsTokens) {
+    const previous = new Only<UnmatchLeaf>();
 
     const inputs: GetMatchedInputs = { matches: this, previous, unmatches };
 
@@ -41,7 +41,7 @@ export class Matches {
     }
   }
 
-  getByType(ref: symbol, type: UnmatchesLeaf["type"]) {
+  getByType(ref: symbol, type: UnmatchLeaf["type"]) {
     if (!this.map.has(ref)) {
       throw new Error();
     }
@@ -100,7 +100,7 @@ export class Matches {
     existing.push(...values);
   }
 
-  add(unmatch: UnmatchesLeaf, match: string | boolean) {
+  add(unmatch: UnmatchLeaf, match: string | boolean) {
     if (unmatch.type === "array") {
       if (typeof match !== "string") {
         throw new Error();

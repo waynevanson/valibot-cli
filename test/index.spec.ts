@@ -250,9 +250,41 @@ const fixtures = [
       },
     ],
   }),
+  // fixture({
+  //   name: "value(array(string))",
+  //   schema: c.value(v.array(v.string()), {
+  //     name: "features",
+  //   }),
+  //   cases: [
+  //     {
+  //       argv: ["--features=feature-1,feature-2"],
+  //       expected: ["feature-1", "feature-2"],
+  //     },
+  //     {
+  //       argv: ["--features=feature-1", "--features=feature-2"],
+  //       expected: ["feature-1", "feature-2"],
+  //     },
+  //     {
+  //       argv: ["--features", "feature-1"],
+  //       expected: ["feature-1"],
+  //     },
+  //     {
+  //       argv: ["--features", "feature-1", "--features", "feature-2"],
+  //       expected: ["feature-1", "feature-2"],
+  //     },
+  //     {
+  //       argv: ["--features", "feature-1", "--features=feature-2"],
+  //       expected: ["feature-1", "feature-2"],
+  //     },
+  //     {
+  //       argv: ["--features=feature-1", "--features", "feature-2"],
+  //       expected: ["feature-1", "feature-2"],
+  //     },
+  //   ],
+  // }),
 ] satisfies ReadonlyArray<Fixture<ParsableSchema>>;
 
-// todo: arrays, default values, objects
+// todo: optional values, objects, subcommand
 describe(c.parse.name, () => {
   const skippable = fixtures.some((a) => a.only);
   const fixes = fixtures.map(

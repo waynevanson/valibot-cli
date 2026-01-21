@@ -10,9 +10,6 @@ import { Matches } from "./matches/index.js";
 import { createArgsTokens } from "./tokens/args.js";
 import { createUnmatches } from "./unmatches.js";
 
-// at the start we allow all args
-// but we eventually it gets narrowed down
-
 export type ParsableSchemaPrimitive =
   | ArgMethod<
       v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,

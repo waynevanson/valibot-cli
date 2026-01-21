@@ -1,10 +1,10 @@
 import type { Matches } from "./matches/index.js";
-import type { Unmatches } from "./unmatches.js";
+import type { Unmatch } from "./unmatches.js";
 
 export type BuildOutput = Array<BuildOutput> | string | boolean;
 
-export function build(unmatches: Unmatches, matches: Matches): BuildOutput {
-  function walk(unmatches: Unmatches) {
+export function build(unmatches: Unmatch, matches: Matches): BuildOutput {
+  function walk(unmatches: Unmatch) {
     switch (unmatches.type) {
       case "string":
       case "boolean":

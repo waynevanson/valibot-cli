@@ -4,13 +4,13 @@ import type {
   ValueToken,
 } from "../tokens/index.js";
 import type {
-  UnmatchesNodeArray,
-  UnmatchesNodeBoolean,
-  UnmatchesNodeString,
+  UnmatchArray,
+  UnmatchBoolean,
+  UnmatchString,
 } from "../unmatches.js";
 
 export function getMatchForValue(
-  unmatch: UnmatchesNodeString | UnmatchesNodeBoolean | UnmatchesNodeArray,
+  unmatch: UnmatchString | UnmatchBoolean | UnmatchArray,
   token: ValueToken | OptionsShortValueToken | OptionLongValueToken,
 ): string | boolean {
   switch (unmatch.type) {

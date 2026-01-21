@@ -1,18 +1,18 @@
 import type { Only } from "../../utils/only.js";
 import type { ArgsToken, OptionToken, ValueToken } from "../tokens/index.js";
-import type { Unmatches, UnmatchesLeaf } from "../unmatches.js";
+import type { Unmatch, UnmatchLeaf } from "../unmatches.js";
 import { getMatchForValue } from "./match.js";
 import type { Matches } from "./matches.js";
 import { getUnmatchForOption, getUnmatchForValue } from "./unmatch.js";
 
 export type Matched =
-  | { type: "previous"; unmatch: UnmatchesLeaf }
-  | { type: "matched"; match: string | boolean; unmatch: UnmatchesLeaf };
+  | { type: "previous"; unmatch: UnmatchLeaf }
+  | { type: "matched"; match: string | boolean; unmatch: UnmatchLeaf };
 
 export interface GetMatchedInputs {
   matches: Matches;
-  previous: Only<UnmatchesLeaf>;
-  unmatches: Unmatches;
+  previous: Only<UnmatchLeaf>;
+  unmatches: Unmatch;
 }
 
 export function getMatched(
