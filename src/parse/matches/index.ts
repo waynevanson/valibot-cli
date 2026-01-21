@@ -28,90 +28,111 @@ export function createMatches(
   const matches = new Matches()
   const previous = new Only<UnmatchesLeaf>()
 
+  const inputs: GetMatchedInputs = { matches, previous, unmatches }
+
   for (const token of tokens) {
-    const matched = getMatched(matches, previous, token, unmatches)
+    const matched = getMatched(token, inputs)
 
     switch (matched.type) {
       case "previous": {
         previous.set(matched.unmatch)
         break
       }
+
       case "matched": {
         matches.add(matched.unmatch, matched.match)
         break
       }
+
       default: {
         throw new Error()
       }
     }
   }
 
+  // resolve the flag as a boolean if we had one
+
   const unmatch = previous.get()
 
   if (unmatch !== undefined) {
-    // no more tokens, resolve the optional flag
     matches.set(unmatch.ref, true)
   }
 
   return matches
 }
 
-type Matched =
+export type Matched =
   | { type: "previous"; unmatch: UnmatchesLeaf }
   | { type: "matched"; match: string | boolean; unmatch: UnmatchesLeaf }
 
-// adding to matches only once
-// todo: values
-function getMatched(
-  matches: Matches,
-  previous: Only<UnmatchesLeaf>,
-  token: ArgsToken,
+export function getMatchedForOption(
+  token: OptionToken,
+  inputs: GetMatchedInputs
+): Matched {
+  const unmatch = getNodeForOptionString(inputs.unmatches, token)
+
+  if (token.value !== undefined) {
+    // `--<identifier>=<value>`
+    const match = deriveMatchValue(unmatch, token)
+
+    return {
+      type: "matched",
+      unmatch,
+      match
+    }
+  }
+
+  // `--<identifier>`
+  // todo: booleans where values are optional
+  if (unmatch.type === "boolean" && unmatch.value !== "required") {
+    return {
+      type: "matched",
+      unmatch,
+      match: true
+    }
+  }
+
+  // schema expects this to have a value
+  return {
+    type: "previous",
+    unmatch
+  }
+}
+
+export function getMatchedForValue(
+  token: ValueToken,
+  inputs: GetMatchedInputs
+): Matched {
+  const unmatch =
+    inputs.previous.get() ??
+    getNodeValueForString(inputs.matches, inputs.unmatches)
+
+  const match = deriveMatchValue(unmatch, token)
+
+  return {
+    type: "matched",
+    match,
+    unmatch
+  }
+}
+
+export interface GetMatchedInputs {
+  matches: Matches
+  previous: Only<UnmatchesLeaf>
   unmatches: Unmatches
+}
+
+export function getMatched(
+  token: ArgsToken,
+  inputs: GetMatchedInputs
 ): Matched {
   switch (token.type) {
     case "option": {
-      const unmatch = getNodeForOptionString(unmatches, token)
-
-      if (token.value === undefined) {
-        // `--<identifier>`
-
-        // todo: booleans where values are optional
-        if (unmatch.type === "boolean" && unmatch.value !== "required") {
-          return {
-            type: "matched",
-            unmatch,
-            match: true
-          }
-        } else {
-          return {
-            type: "previous",
-            unmatch
-          }
-        }
-      } else {
-        // todo: push a value into the matches
-        // `--<identifier>=<value>`
-        const match = createMatchValue(unmatch, token)
-
-        return {
-          type: "matched",
-          unmatch,
-          match
-        }
-      }
+      return getMatchedForOption(token, inputs)
     }
 
     case "value": {
-      const unmatch =
-        previous.get() ?? getNodeValueForString(matches, unmatches)
-
-      const match = createMatchValue(unmatch, token)
-
-      return {
-        type: "matched",
-        match,
-        unmatch
-      }
+      return getMatchedForValue(token, inputs)
     }
 
     default:
@@ -119,7 +140,7 @@ function getMatched(
   }
 }
 
-function createMatchValue(
+export function deriveMatchValue(
   unmatch: UnmatchesNodeString | UnmatchesNodeBoolean | UnmatchesNodeArray,
   token: ValueToken | OptionsShortValueToken | OptionLongValueToken
 ): string | boolean {
@@ -155,6 +176,7 @@ export function getNodeValueForString(matches: Matches, unmatches: Unmatches) {
           break
         }
 
+        // exists.
         if (matches.has(unmatches.ref)) {
           break
         }

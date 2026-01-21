@@ -48,20 +48,22 @@ export function createUnmatches<Schema extends ParsableSchema>(
   schema: Schema
 ): Unmatches {
   function walk(schema: ParsableSchema): Unmatches {
+    const ref = Symbol()
+
     switch (schema.type) {
       case "string": {
         const metadata = getArgMethodMetadata(schema)
-        return { type: schema.type, ref: Symbol(), value: "required", metadata }
+        return { type: schema.type, ref, value: "required", metadata }
       }
 
       case "boolean": {
         const metadata = getArgMethodMetadata(schema)
-        return { type: schema.type, ref: Symbol(), value: "required", metadata }
+        return { type: schema.type, ref, value: "required", metadata }
       }
 
       case "strict_tuple": {
         const items = schema.items.map((item) => walk(item as never))
-        return { type: schema.type, ref: Symbol(), items }
+        return { type: schema.type, ref, items }
       }
 
       case "array": {
@@ -72,7 +74,7 @@ export function createUnmatches<Schema extends ParsableSchema>(
           item: {
             type: schema.item.type
           },
-          ref: Symbol(),
+          ref,
           metadata
         }
       }
@@ -84,4 +86,49 @@ export function createUnmatches<Schema extends ParsableSchema>(
   }
 
   return walk(schema)
+}
+
+export function find(
+  unmatches: Unmatches,
+  predicate: (leaf: UnmatchesLeaf) => boolean
+): UnmatchesLeaf {
+  function walk(unmatches: Unmatches): UnmatchesLeaf | undefined {
+    switch (unmatches.type) {
+      case "array":
+      case "string":
+      case "boolean": {
+        if (predicate(unmatches)) {
+          return unmatches
+        }
+
+        break
+      }
+
+      case "strict_tuple": {
+        for (const item of unmatches.items) {
+          const unmatch = walk(item)
+
+          if (unmatch !== undefined) {
+            return unmatch
+          }
+        }
+
+        break
+      }
+
+      default: {
+        throw new Error()
+      }
+    }
+
+    return undefined
+  }
+
+  const value = walk(unmatches)
+
+  if (value === undefined) {
+    throw new Error()
+  }
+
+  return value
 }
