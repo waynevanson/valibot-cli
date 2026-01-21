@@ -13,6 +13,7 @@ import {
   ValueToken
 } from "../arg-token.js"
 import {
+  find,
   Unmatches,
   UnmatchesLeaf,
   UnmatchesNodeArray,
@@ -69,11 +70,11 @@ export function getMatchedForOption(
   token: OptionToken,
   inputs: GetMatchedInputs
 ): Matched {
-  const unmatch = getNodeForOptionString(inputs.unmatches, token)
+  const unmatch = getUnmatchForOption(inputs.unmatches, token)
 
+  // `--<identifier>=<value>`
   if (token.value !== undefined) {
-    // `--<identifier>=<value>`
-    const match = deriveMatchValue(unmatch, token)
+    const match = getMatchForValue(unmatch, token)
 
     return {
       type: "matched",
@@ -93,6 +94,7 @@ export function getMatchedForOption(
   }
 
   // schema expects this to have a value
+  // `--identifier [value]`
   return {
     type: "previous",
     unmatch
@@ -105,9 +107,9 @@ export function getMatchedForValue(
 ): Matched {
   const unmatch =
     inputs.previous.get() ??
-    getNodeValueForString(inputs.matches, inputs.unmatches)
+    getUnmatchForValue(inputs.matches, inputs.unmatches)
 
-  const match = deriveMatchValue(unmatch, token)
+  const match = getMatchForValue(unmatch, token)
 
   return {
     type: "matched",
@@ -140,19 +142,13 @@ export function getMatched(
   }
 }
 
-export function deriveMatchValue(
+export function getMatchForValue(
   unmatch: UnmatchesNodeString | UnmatchesNodeBoolean | UnmatchesNodeArray,
   token: ValueToken | OptionsShortValueToken | OptionLongValueToken
 ): string | boolean {
   switch (unmatch.type) {
     case "boolean": {
-      const value = deriveBooleanFromValue(token.value)
-
-      if (value === undefined) {
-        throw new Error()
-      }
-
-      return value
+      return deriveBooleanFromValue(token.value)
     }
 
     case "string":
@@ -166,144 +162,43 @@ export function deriveMatchValue(
   }
 }
 
-export function getNodeValueForString(matches: Matches, unmatches: Unmatches) {
-  function walk(
-    unmatches: Unmatches
-  ): UnmatchesNodeString | UnmatchesNodeBoolean | undefined {
-    switch (unmatches.type) {
+export function getUnmatchForValue(matches: Matches, unmatches: Unmatches) {
+  return find(unmatches, (unmatch) => {
+    switch (unmatch.type) {
       case "string": {
-        if (!v.is(ArgValueMetadata, unmatches.metadata)) {
-          break
-        }
-
-        // exists.
-        if (matches.has(unmatches.ref)) {
-          break
-        }
-
-        return unmatches
+        return (
+          v.is(ArgValueMetadata, unmatch.metadata) && !matches.has(unmatch.ref)
+        )
       }
 
       case "boolean": {
-        if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
-          break
-        }
-
-        return unmatches
-      }
-
-      case "strict_tuple": {
-        for (const item of unmatches.items) {
-          const unmatch = walk(item)
-
-          if (unmatch !== undefined) {
-            return unmatch
-          }
-        }
+        return v.is(ArgOptionMetadata, unmatch.metadata)
       }
 
       default: {
         throw new Error()
       }
     }
-
-    return undefined
-  }
-
-  const value = walk(unmatches)
-
-  if (value === undefined) {
-    throw new Error()
-  }
-
-  return value
+  })
 }
 
-export function getNodeForOptionString(
-  unmatches: Unmatches,
-  token: OptionToken
-) {
-  function walk(
-    unmatches: Unmatches
-  ):
-    | UnmatchesNodeString
-    | UnmatchesNodeBoolean
-    | UnmatchesNodeArray
-    | undefined {
-    switch (unmatches.type) {
-      case "string": {
-        if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
-          break
-        }
-
-        const identifiers = token.short
-          ? unmatches.metadata.shorts
-          : unmatches.metadata.longs
-
-        if (!identifiers.includes(token.identifier)) {
-          break
-        }
-
-        return unmatches
+export function getUnmatchForOption(unmatches: Unmatches, token: OptionToken) {
+  return find(unmatches, (unmatches) => {
+    {
+      if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
+        return false
       }
 
-      case "boolean": {
-        if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
-          break
-        }
+      const identifiers = token.short
+        ? unmatches.metadata.shorts
+        : unmatches.metadata.longs
 
-        const identifiers = token.short
-          ? unmatches.metadata.shorts
-          : unmatches.metadata.longs
-
-        if (!identifiers.includes(token.identifier)) {
-          break
-        }
-
-        return unmatches
-      }
-
-      case "strict_tuple": {
-        for (const item of unmatches.items) {
-          const unmatch = walk(item)
-
-          if (unmatch !== undefined) {
-            return unmatch
-          }
-        }
-        break
-      }
-
-      case "array": {
-        const identifiers = token.short
-          ? unmatches.metadata.shorts
-          : unmatches.metadata.longs
-
-        if (!identifiers.includes(token.identifier)) {
-          break
-        }
-
-        return unmatches
-      }
-
-      default: {
-        throw new Error()
-      }
+      return identifiers.includes(token.identifier)
     }
-
-    return undefined
-  }
-
-  const value = walk(unmatches)
-
-  if (value === undefined) {
-    throw new Error()
-  }
-
-  return value
+  })
 }
 
-function deriveBooleanFromValue(value: string) {
+export function deriveBooleanFromValue(value: string) {
   if (value == "true" || value == "1") {
     return true
   }
@@ -312,5 +207,5 @@ function deriveBooleanFromValue(value: string) {
     return false
   }
 
-  return undefined
+  throw new Error()
 }
