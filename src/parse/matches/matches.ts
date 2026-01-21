@@ -1,10 +1,4 @@
 import { UnmatchesLeaf } from "../unmatches.js"
-import { Only } from "../../utils/only.js"
-
-export interface MatchesState {
-  matches: Matches
-  previous: Only<UnmatchesLeaf>
-}
 
 export type Match = string | boolean | Array<string>
 

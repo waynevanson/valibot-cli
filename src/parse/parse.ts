@@ -4,7 +4,7 @@ import {
   ArgOptionMetadata,
   ArgValueMetadata
 } from "../methods/index.js"
-import { createArgsTokens } from "./arg-token.js"
+import { createArgsTokens } from "./tokens/args.js"
 import { build } from "./build.js"
 import { createMatches } from "./matches/index.js"
 import { createUnmatches } from "./unmatches.js"
