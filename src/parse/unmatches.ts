@@ -36,8 +36,11 @@ export type UnmatchesNodeArray = {
 
 export type UnmatchesNodeArrayItem = { type: "string" } | { type: "boolean" }
 
-export type UnmatchesBranch = UnmatchesNodeStructTuple | UnmatchesNodeArray
-export type UnmatchesLeaf = UnmatchesNodeString | UnmatchesNodeBoolean
+export type UnmatchesBranch = UnmatchesNodeStructTuple
+export type UnmatchesLeaf =
+  | UnmatchesNodeString
+  | UnmatchesNodeBoolean
+  | UnmatchesNodeArray
 
 export type Unmatches = UnmatchesBranch | UnmatchesLeaf
 

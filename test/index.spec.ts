@@ -227,6 +227,14 @@ const fixtures = [
       {
         argv: ["--features=feature-1,feature-2"],
         expected: ["feature-1", "feature-2"]
+      },
+      {
+        argv: ["--features=feature-1", "--features=feature-2"],
+        expected: ["feature-1", "feature-2"]
+      },
+      {
+        argv: ["--features", "feature-1"],
+        expected: ["feature-1"]
       }
     ]
   })

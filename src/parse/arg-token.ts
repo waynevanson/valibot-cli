@@ -12,40 +12,40 @@ export type OptionToken =
   | OptionShortToken
 
 export type OptionLongValueToken = {
-  type: "option"
-  short: false
-  identifier: string
-  value: string
+  readonly type: "option"
+  readonly short: false
+  readonly identifier: string
+  readonly value: string
 }
 
 export type OptionLongToken = {
-  type: "option"
-  short: false
-  identifier: string
-  value: undefined
+  readonly type: "option"
+  readonly short: false
+  readonly identifier: string
+  readonly value: undefined
 }
 
 export type OptionsShortValueToken = {
-  type: "option"
-  identifier: string
-  value: string
-  short: true
+  readonly type: "option"
+  readonly identifier: string
+  readonly value: string
+  readonly short: true
 }
 
 export type OptionShortToken = {
-  type: "option"
-  identifier: string
-  short: true
-  value: undefined
+  readonly type: "option"
+  readonly identifier: string
+  readonly short: true
+  readonly value: undefined
 }
 
 export type PrevaluesToken = {
-  type: "prevalues"
+  readonly type: "prevalues"
 }
 
 export type ValueToken = {
-  type: "value"
-  value: string
+  readonly type: "value"
+  readonly value: string
 }
 
 export type ArgTokens = Array<ArgToken>

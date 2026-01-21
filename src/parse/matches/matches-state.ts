@@ -1,35 +1,15 @@
-import { boolean } from "valibot"
-import {
-  UnmatchesNodeString,
-  UnmatchesNodeBoolean,
-  UnmatchesNodeArray
-} from "../unmatches.js"
+import { UnmatchesLeaf } from "../unmatches.js"
+import { Only } from "./only.js"
 
-export class MatchesState {
-  matches = new Matches()
-  previous:
-    | undefined
-    | UnmatchesNodeString
-    | UnmatchesNodeBoolean
-    | UnmatchesNodeArray = undefined
-
-  // consume the previous match if it existed
-  prev() {
-    if (this.previous === undefined) {
-      return undefined
-    }
-
-    const unmatch = this.previous
-    this.previous = undefined
-
-    return unmatch
-  }
+export interface MatchesState {
+  matches: Matches
+  previous: Only<UnmatchesLeaf>
 }
 
 export class Matches {
   map = new Map<symbol, Match>()
 
-  getByType(ref: symbol, type: "string" | "boolean" | "array") {
+  getByType(ref: symbol, type: UnmatchesLeaf["type"]) {
     if (!this.map.has(ref)) {
       throw new Error()
     }
@@ -85,6 +65,18 @@ export class Matches {
     }
 
     existing.push(...values)
+  }
+
+  add(unmatch: UnmatchesLeaf, match: string | boolean) {
+    if (unmatch.type === "array") {
+      if (typeof match !== "string") {
+        throw new Error()
+      }
+
+      this.append(unmatch.ref, ...match.split(","))
+    } else {
+      this.set(unmatch.ref, match)
+    }
   }
 }
 

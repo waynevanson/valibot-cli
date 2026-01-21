@@ -13,11 +13,13 @@ import {
 } from "../arg-token.js"
 import {
   Unmatches,
+  UnmatchesLeaf,
   UnmatchesNodeArray,
   UnmatchesNodeBoolean,
   UnmatchesNodeString
 } from "../unmatches.js"
 import { Matches, MatchesState } from "./matches-state.js"
+import { Only } from "./only.js"
 
 export function createMatches(
   unmatches: Unmatches,
@@ -35,22 +37,15 @@ export function createMatches(
           if (unmatch.type === "boolean" && unmatch.value !== "required") {
             state.matches.set(unmatch.ref, true)
           } else {
-            state.previous = unmatch
+            state.previous.push(unmatch)
           }
         } else {
           // todo: push a value into the matches
           // `--<identifier>=<value>`
           const match = createMatchValue(unmatch, token)
 
-          if (unmatch.type === "array") {
-            if (typeof match !== "string") {
-              throw new Error()
-            }
-
-            state.matches.append(unmatch.ref, ...match.split(","))
-          } else {
-            state.matches.set(unmatch.ref, match)
-          }
+          // refactor this into something probably
+          state.matches.add(unmatch, match)
         }
 
         break
@@ -58,11 +53,12 @@ export function createMatches(
 
       case "value": {
         const unmatch =
-          state.prev() ?? getNodeValueForString(state.matches, unmatches)
+          state.previous.pull() ??
+          getNodeValueForString(state.matches, unmatches)
 
         const match = createMatchValue(unmatch, token)
 
-        state.matches.set(unmatch.ref, match)
+        state.matches.add(unmatch, match)
 
         break
       }
@@ -74,12 +70,12 @@ export function createMatches(
     return state
   }
 
-  const state = tokens.reduce(
-    (state, token) => walk(state, token),
-    new MatchesState()
-  )
+  const state = tokens.reduce((state, token) => walk(state, token), {
+    matches: new Matches(),
+    previous: new Only<UnmatchesLeaf>()
+  } satisfies MatchesState)
 
-  const prev = state.prev()
+  const prev = state.previous.pull()
 
   if (prev !== undefined) {
     // no more tokens, resolve the optional flag
