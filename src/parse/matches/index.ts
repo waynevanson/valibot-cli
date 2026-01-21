@@ -19,63 +19,18 @@ import {
   UnmatchesNodeString
 } from "../unmatches.js"
 import { Matches, MatchesState } from "./matches-state.js"
-import { Only } from "./only.js"
+import { Only } from "../../utils/only.js"
 
 export function createMatches(
   unmatches: Unmatches,
   tokens: ArgsTokens
 ): Matches {
-  function walk(state: MatchesState, token: ArgsToken): MatchesState {
-    switch (token.type) {
-      case "option": {
-        const unmatch = getNodeForOptionString(unmatches, token)
-
-        if (token.value === undefined) {
-          // `--<identifier>`
-
-          // todo: booleans where values are optional
-          if (unmatch.type === "boolean" && unmatch.value !== "required") {
-            state.matches.set(unmatch.ref, true)
-          } else {
-            state.previous.push(unmatch)
-          }
-        } else {
-          // todo: push a value into the matches
-          // `--<identifier>=<value>`
-          const match = createMatchValue(unmatch, token)
-
-          // refactor this into something probably
-          state.matches.add(unmatch, match)
-        }
-
-        break
-      }
-
-      case "value": {
-        const unmatch =
-          state.previous.pull() ??
-          getNodeValueForString(state.matches, unmatches)
-
-        const match = createMatchValue(unmatch, token)
-
-        state.matches.add(unmatch, match)
-
-        break
-      }
-
-      default:
-        throw new Error()
-    }
-
-    return state
-  }
-
-  const state = tokens.reduce((state, token) => walk(state, token), {
+  const state = tokens.reduce((state, token) => walk(state, token, unmatches), {
     matches: new Matches(),
     previous: new Only<UnmatchesLeaf>()
   } satisfies MatchesState)
 
-  const prev = state.previous.pull()
+  const prev = state.previous.get()
 
   if (prev !== undefined) {
     // no more tokens, resolve the optional flag
@@ -83,6 +38,55 @@ export function createMatches(
   }
 
   return state.matches
+}
+
+// adding to matches only once
+function walk(
+  state: MatchesState,
+  token: ArgsToken,
+  unmatches: Unmatches
+): MatchesState {
+  switch (token.type) {
+    case "option": {
+      const unmatch = getNodeForOptionString(unmatches, token)
+
+      if (token.value === undefined) {
+        // `--<identifier>`
+
+        // todo: booleans where values are optional
+        if (unmatch.type === "boolean" && unmatch.value !== "required") {
+          state.matches.set(unmatch.ref, true)
+        } else {
+          state.previous.set(unmatch)
+        }
+      } else {
+        // todo: push a value into the matches
+        // `--<identifier>=<value>`
+        const match = createMatchValue(unmatch, token)
+
+        // refactor this into something probably
+        state.matches.add(unmatch, match)
+      }
+
+      break
+    }
+
+    case "value": {
+      const unmatch =
+        state.previous.get() ?? getNodeValueForString(state.matches, unmatches)
+
+      const match = createMatchValue(unmatch, token)
+
+      state.matches.add(unmatch, match)
+
+      break
+    }
+
+    default:
+      throw new Error()
+  }
+
+  return state
 }
 
 function createMatchValue(

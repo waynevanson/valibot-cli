@@ -1,10 +1,12 @@
 import { UnmatchesLeaf } from "../unmatches.js"
-import { Only } from "./only.js"
+import { Only } from "../../utils/only.js"
 
 export interface MatchesState {
   matches: Matches
   previous: Only<UnmatchesLeaf>
 }
+
+export type Match = string | boolean | Array<string>
 
 export class Matches {
   map = new Map<symbol, Match>()
@@ -79,5 +81,3 @@ export class Matches {
     }
   }
 }
-
-export type Match = string | boolean | Array<string>
