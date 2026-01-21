@@ -1,5 +1,9 @@
 import * as v from "valibot";
-import { ArgOptionMetadata, ArgValueMetadata } from "../../methods/index.js";
+import {
+  ArgOptionMetadata,
+  ArgSubcommandMetadata,
+  ArgValueMetadata,
+} from "../../methods/index.js";
 import type { ParsableSchema } from "../parse.js";
 import type { OptionToken } from "../tokens/index.js";
 import type { Unmatches } from "../unmatches.js";
@@ -19,6 +23,10 @@ export function getUnmatchForValue(
 
       case "boolean": {
         return v.is(ArgOptionMetadata, unmatch.metadata);
+      }
+
+      case "array": {
+        return !v.is(ArgSubcommandMetadata, unmatch.metadata);
       }
 
       default: {

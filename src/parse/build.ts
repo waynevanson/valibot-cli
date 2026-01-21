@@ -11,9 +11,14 @@ export function build(
   function walk(unmatch: Unmatch) {
     switch (unmatch.type) {
       case "string":
-      case "boolean":
-      case "array": {
+      case "boolean": {
         return matches.getByType(unmatch.ref, unmatch.type);
+      }
+
+      case "array": {
+        return matches.has(unmatch.ref)
+          ? matches.getByType(unmatch.ref, unmatch.type)
+          : [];
       }
 
       case "strict_tuple": {

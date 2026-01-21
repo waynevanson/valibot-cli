@@ -46,7 +46,7 @@ export class Matches {
     }
   }
 
-  getByType(ref: symbol, type: UnmatchLeaf["type"]) {
+  get(ref: symbol) {
     if (!this.map.has(ref)) {
       throw new Error();
     }
@@ -54,6 +54,11 @@ export class Matches {
     // biome-ignore lint/style/noNonNullAssertion: Asserted above
     const value = this.map.get(ref)!;
 
+    return value;
+  }
+
+  getByType(ref: symbol, type: UnmatchLeaf["type"]) {
+    const value = this.get(ref);
     switch (type) {
       case "boolean":
       case "string":
@@ -111,7 +116,9 @@ export class Matches {
         throw new Error();
       }
 
-      this.append(unmatch.ref, ...match.split(","));
+      const m = unmatch.metadata.type === "option" ? match.split(",") : [match];
+
+      this.append(unmatch.ref, ...m);
     } else {
       this.set(unmatch.ref, match);
     }

@@ -30,7 +30,7 @@ export type UnmatchArray = {
   ref: symbol;
   item: UnmatchArrayItem;
   type: "array";
-  metadata: ArgOptionMetadata;
+  metadata: ArgOptionMetadata | ArgValueMetadata;
 };
 
 export type UnmatchArrayItem = { type: "string" } | { type: "boolean" };

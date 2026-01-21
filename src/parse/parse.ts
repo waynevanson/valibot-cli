@@ -34,7 +34,7 @@ export type ParsableSchema =
         v.ErrorMessage<v.ArrayIssue> | undefined
       >,
       // todo: ArgValueMetadata
-      ArgOptionMetadata
+      ArgOptionMetadata | ArgValueMetadata
     >;
 
 export function parse<TSchema extends ParsableSchema>(
