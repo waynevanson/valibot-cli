@@ -40,91 +40,93 @@ export type UnmatchLeaf = UnmatchString | UnmatchBoolean | UnmatchArray;
 
 export type Unmatch = UunmatchBranch | UnmatchLeaf;
 
-export function createUnmatches<Schema extends ParsableSchema>(
-  schema: Schema,
-): Unmatch {
-  function walk(schema: ParsableSchema): Unmatch {
-    const ref = Symbol();
+// todo: constrain input to valid types
+export class Unmatches<Schema extends ParsableSchema = ParsableSchema> {
+  readonly value: Unmatch;
 
-    switch (schema.type) {
-      case "string": {
-        const metadata = getArgMethodMetadata(schema);
-        return { type: schema.type, ref, value: "required", metadata };
-      }
-
-      case "boolean": {
-        const metadata = getArgMethodMetadata(schema);
-        return { type: schema.type, ref, value: "required", metadata };
-      }
-
-      case "strict_tuple": {
-        const items = schema.items.map((item) => walk(item as never));
-        return { type: schema.type, ref, items };
-      }
-
-      case "array": {
-        // do I need to get the string?
-        const metadata = getArgMethodMetadata(schema);
-        return {
-          type: "array",
-          item: {
-            type: schema.item.type,
-          },
-          ref,
-          metadata,
-        };
-      }
-
-      default: {
-        throw new Error();
-      }
-    }
+  constructor(schema: Schema) {
+    this.value = construct(schema);
   }
 
-  return walk(schema);
+  find(predicate: (leaf: UnmatchLeaf) => boolean): UnmatchLeaf {
+    const value = find(this.value, predicate);
+
+    if (value === undefined) {
+      throw new Error();
+    }
+
+    return value;
+  }
 }
 
-export function find(
-  unmatches: Unmatch,
-  predicate: (leaf: UnmatchLeaf) => boolean,
-): UnmatchLeaf {
-  function walk(unmatches: Unmatch): UnmatchLeaf | undefined {
-    switch (unmatches.type) {
-      case "array":
-      case "string":
-      case "boolean": {
-        if (predicate(unmatches)) {
-          return unmatches;
-        }
+function construct(schema: ParsableSchema): Unmatch {
+  const ref = Symbol();
 
-        break;
-      }
-
-      case "strict_tuple": {
-        for (const item of unmatches.items) {
-          const unmatch = walk(item);
-
-          if (unmatch !== undefined) {
-            return unmatch;
-          }
-        }
-
-        break;
-      }
-
-      default: {
-        throw new Error();
-      }
+  switch (schema.type) {
+    case "string": {
+      const metadata = getArgMethodMetadata(schema);
+      return { type: schema.type, ref, value: "required", metadata };
     }
 
-    return undefined;
+    case "boolean": {
+      const metadata = getArgMethodMetadata(schema);
+      return { type: schema.type, ref, value: "required", metadata };
+    }
+
+    case "strict_tuple": {
+      const items = schema.items.map((item) => construct(item as never));
+      return { type: schema.type, ref, items };
+    }
+
+    case "array": {
+      const metadata = getArgMethodMetadata(schema);
+      return {
+        type: "array",
+        item: {
+          type: schema.item.type,
+        },
+        ref,
+        metadata,
+      };
+    }
+
+    default: {
+      throw new Error();
+    }
+  }
+}
+
+function find(
+  unmatches: Unmatch,
+  predicate: (leaf: UnmatchLeaf) => boolean,
+): UnmatchLeaf | undefined {
+  switch (unmatches.type) {
+    case "array":
+    case "string":
+    case "boolean": {
+      if (predicate(unmatches)) {
+        return unmatches;
+      }
+
+      break;
+    }
+
+    case "strict_tuple": {
+      for (const item of unmatches.items) {
+        const unmatch = find(item, predicate);
+
+        if (unmatch !== undefined) {
+          return unmatch;
+        }
+      }
+
+      break;
+    }
+
+    default: {
+      throw new Error();
+    }
   }
 
-  const value = walk(unmatches);
-
-  if (value === undefined) {
-    throw new Error();
-  }
-
-  return value;
+  return undefined;
 }

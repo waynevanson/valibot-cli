@@ -1,11 +1,15 @@
 import * as v from "valibot";
 import { ArgOptionMetadata, ArgValueMetadata } from "../../methods/index.js";
+import type { ParsableSchema } from "../parse.js";
 import type { OptionToken } from "../tokens/index.js";
-import { find, type Unmatch } from "../unmatches.js";
+import type { Unmatches } from "../unmatches.js";
 import type { Matches } from "./matches.js";
 
-export function getUnmatchForValue(matches: Matches, unmatches: Unmatch) {
-  return find(unmatches, (unmatch) => {
+export function getUnmatchForValue(
+  matches: Matches,
+  unmatches: Unmatches<ParsableSchema>,
+) {
+  return unmatches.find((unmatch) => {
     switch (unmatch.type) {
       case "string": {
         return (
@@ -24,8 +28,11 @@ export function getUnmatchForValue(matches: Matches, unmatches: Unmatch) {
   });
 }
 
-export function getUnmatchForOption(unmatches: Unmatch, token: OptionToken) {
-  return find(unmatches, (unmatches) => {
+export function getUnmatchForOption(
+  unmatches: Unmatches<ParsableSchema>,
+  token: OptionToken,
+) {
+  return unmatches.find((unmatches) => {
     {
       if (!v.is(ArgOptionMetadata, unmatches.metadata)) {
         return false;

@@ -1,6 +1,7 @@
 import type { Only } from "../../utils/only.js";
+import type { ParsableSchema } from "../parse.js";
 import type { ArgsToken, OptionToken, ValueToken } from "../tokens/index.js";
-import type { Unmatch, UnmatchLeaf } from "../unmatches.js";
+import type { Unmatches, UnmatchLeaf } from "../unmatches.js";
 import { getMatchForValue } from "./match.js";
 import type { Matches } from "./matches.js";
 import { getUnmatchForOption, getUnmatchForValue } from "./unmatch.js";
@@ -12,7 +13,7 @@ export type Matched =
 export interface GetMatchedInputs {
   matches: Matches;
   previous: Only<UnmatchLeaf>;
-  unmatches: Unmatch;
+  unmatches: Unmatches<ParsableSchema>;
 }
 
 export function getMatched(

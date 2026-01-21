@@ -1,6 +1,7 @@
 import { Only } from "../../utils/only.js";
+import type { ParsableSchema } from "../parse.js";
 import type { ArgsTokens } from "../tokens/args.js";
-import type { Unmatch, UnmatchLeaf } from "../unmatches.js";
+import type { Unmatches, UnmatchLeaf } from "../unmatches.js";
 import { type GetMatchedInputs, getMatched } from "./matched.js";
 
 export type Match = string | boolean | Array<string>;
@@ -8,10 +9,14 @@ export type Match = string | boolean | Array<string>;
 export class Matches {
   map = new Map<symbol, Match>();
 
-  constructor(unmatches: Unmatch, tokens: ArgsTokens) {
+  constructor(unmatches: Unmatches<ParsableSchema>, tokens: ArgsTokens) {
     const previous = new Only<UnmatchLeaf>();
 
-    const inputs: GetMatchedInputs = { matches: this, previous, unmatches };
+    const inputs: GetMatchedInputs = {
+      matches: this,
+      previous,
+      unmatches,
+    };
 
     for (const token of tokens) {
       const matched = getMatched(token, inputs);

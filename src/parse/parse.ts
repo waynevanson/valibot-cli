@@ -8,7 +8,7 @@ import type { MaybeReadonly } from "../utils/index.js";
 import { build } from "./build.js";
 import { Matches } from "./matches/index.js";
 import { createArgsTokens } from "./tokens/args.js";
-import { createUnmatches } from "./unmatches.js";
+import { Unmatches } from "./unmatches.js";
 
 export type ParsableSchemaPrimitive =
   | ArgMethod<
@@ -41,7 +41,7 @@ export function parse<TSchema extends ParsableSchema>(
   schema: TSchema,
   args: ReadonlyArray<string>,
 ): v.InferInput<TSchema> {
-  const unmatches = createUnmatches(schema);
+  const unmatches = new Unmatches(schema);
   const tokens = createArgsTokens(args);
   const matches = new Matches(unmatches, tokens);
   const input = build(unmatches, matches);

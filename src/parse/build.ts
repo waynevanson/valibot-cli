@@ -1,9 +1,13 @@
 import type { Matches } from "./matches/index.js";
-import type { Unmatch } from "./unmatches.js";
+import type { ParsableSchema } from "./parse.js";
+import type { Unmatch, Unmatches } from "./unmatches.js";
 
 export type BuildOutput = Array<BuildOutput> | string | boolean;
 
-export function build(unmatches: Unmatch, matches: Matches): BuildOutput {
+export function build(
+  unmatches: Unmatches<ParsableSchema>,
+  matches: Matches,
+): BuildOutput {
   function walk(unmatches: Unmatch) {
     switch (unmatches.type) {
       case "string":
@@ -29,5 +33,5 @@ export function build(unmatches: Unmatch, matches: Matches): BuildOutput {
     }
   }
 
-  return walk(unmatches);
+  return walk(unmatches.value);
 }
