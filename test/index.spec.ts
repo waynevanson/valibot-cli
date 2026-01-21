@@ -274,6 +274,13 @@ const fixtures = [
       },
     ],
   }),
+
+  // fixture({
+  //   name: "subcommand('a' | 'b')",
+  //   only:true,
+  //   schema:c.subcommand({}),
+  //   cases:[],
+  // }),
 ] satisfies ReadonlyArray<Fixture<ParsableSchema>>;
 
 // todo: optional values, objects, subcommand, help
