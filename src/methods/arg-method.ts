@@ -31,7 +31,7 @@ export function isArgMethod<T extends v.GenericSchema>(
     schema.pipe[1]?.kind === "metadata" &&
     schema.pipe[1]?.type === "metadata" &&
     typeof schema.pipe[1]?.metadata === "object" &&
-    ARG_METADATA in schema.pipe[1]?.metadata
+    ARG_METADATA in schema.pipe[1].metadata
   );
 }
 

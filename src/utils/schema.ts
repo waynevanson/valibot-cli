@@ -23,6 +23,7 @@ export type UnPipe<
   TSchema extends v.SchemaWithPipe<
     readonly [
       infer T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+      // biome-ignore lint/suspicious/noExplicitAny: From underneath
       ...any,
     ]
   >

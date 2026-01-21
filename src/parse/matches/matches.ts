@@ -10,6 +10,7 @@ export class Matches {
       throw new Error();
     }
 
+    // biome-ignore lint/style/noNonNullAssertion: Asserted above
     const value = this.map.get(ref)!;
 
     switch (type) {

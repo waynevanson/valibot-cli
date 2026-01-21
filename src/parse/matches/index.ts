@@ -1,11 +1,6 @@
-import * as v from "valibot";
-import {
-  ArgOptionMetadata,
-  ArgValueMetadata,
-} from "../../methods/arg-metadata.js";
 import { Only } from "../../utils/only.js";
-import { type ArgsTokens, OptionToken } from "../tokens/args.js";
-import { find, type Unmatches, type UnmatchesLeaf } from "../unmatches.js";
+import type { ArgsTokens } from "../tokens/args.js";
+import type { Unmatches, UnmatchesLeaf } from "../unmatches.js";
 import { type GetMatchedInputs, getMatched } from "./matched.js";
 import { Matches } from "./matches.js";
 

@@ -28,6 +28,7 @@ export type Subcommand =
   | v.SchemaWithPipe<
       readonly [
         v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+        // biome-ignore lint/suspicious/noExplicitAny: From underneath
         ...v.PipeItem<any, unknown, v.BaseIssue<unknown>>[],
       ]
     >;

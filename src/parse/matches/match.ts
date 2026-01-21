@@ -30,11 +30,11 @@ export function getMatchForValue(
 }
 
 export function deriveBooleanFromValue(value: string) {
-  if (value == "true" || value == "1") {
+  if (value === "true" || value === "1") {
     return true;
   }
 
-  if (value == "false" || value == "0") {
+  if (value === "false" || value === "0") {
     return false;
   }
 
