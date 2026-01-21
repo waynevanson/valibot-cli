@@ -1,7 +1,7 @@
-import * as v from "valibot"
-import { ArgValueMetadata } from "./arg-metadata.js"
-import { arg } from "./arg-method.js"
-import type { MaybeReadonly } from "../utils/index.js"
+import type * as v from "valibot";
+import type { MaybeReadonly } from "../utils/index.js";
+import type { ArgValueMetadata } from "./arg-metadata.js";
+import { arg } from "./arg-method.js";
 
 export type ValueSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
@@ -19,11 +19,11 @@ export type ValueSchema =
         >
       >,
       v.ErrorMessage<v.StrictTupleIssue> | undefined
-    >
+    >;
 
 export function value<TSchema extends ValueSchema>(
   schema: TSchema,
-  value: Omit<ArgValueMetadata, "type">
+  value: Omit<ArgValueMetadata, "type">,
 ) {
-  return arg(schema, { type: "value", ...value })
+  return arg(schema, { type: "value", ...value });
 }

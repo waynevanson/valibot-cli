@@ -8,22 +8,22 @@ export class Only<T> {
 
   get() {
     if (this.value === undefined) {
-      return undefined
+      return undefined;
     }
 
-    const value = this.value
-    this.value = undefined
+    const value = this.value;
+    this.value = undefined;
 
-    return value
+    return value;
   }
 
   set(value: Exclude<T, undefined>) {
     if (this.value !== undefined) {
-      throw new Error()
+      throw new Error();
     }
 
-    this.value = value
+    this.value = value;
 
-    return value
+    return value;
   }
 }

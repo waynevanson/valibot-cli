@@ -1,7 +1,7 @@
-import { Matches } from "./matches/matches-state.js"
-import { Unmatches } from "./unmatches.js"
+import type { Matches } from "./matches/matches-state.js";
+import type { Unmatches } from "./unmatches.js";
 
-export type BuildOutput = Array<BuildOutput> | string | boolean
+export type BuildOutput = Array<BuildOutput> | string | boolean;
 
 export function build(unmatches: Unmatches, matches: Matches): BuildOutput {
   function walk(unmatches: Unmatches) {
@@ -9,25 +9,25 @@ export function build(unmatches: Unmatches, matches: Matches): BuildOutput {
       case "string":
       case "boolean":
       case "array": {
-        return matches.getByType(unmatches.ref, unmatches.type)
+        return matches.getByType(unmatches.ref, unmatches.type);
       }
 
       case "strict_tuple": {
-        const tuple: BuildOutput = []
+        const tuple: BuildOutput = [];
 
         for (const unmatch of unmatches.items) {
-          const match = walk(unmatch)
-          tuple.push(match)
+          const match = walk(unmatch);
+          tuple.push(match);
         }
 
-        return tuple
+        return tuple;
       }
 
       default: {
-        throw new Error()
+        throw new Error();
       }
     }
   }
 
-  return walk(unmatches)
+  return walk(unmatches);
 }

@@ -1,6 +1,6 @@
-import * as v from "valibot"
-import { ArgSubcommandMetadata } from "./arg-metadata.js"
-import { arg } from "./arg-method.js"
+import type * as v from "valibot";
+import type { ArgSubcommandMetadata } from "./arg-metadata.js";
+import { arg } from "./arg-method.js";
 
 export type Subcommand =
   | v.ArraySchema<
@@ -28,14 +28,14 @@ export type Subcommand =
   | v.SchemaWithPipe<
       readonly [
         v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
-        ...v.PipeItem<any, unknown, v.BaseIssue<unknown>>[]
+        ...v.PipeItem<any, unknown, v.BaseIssue<unknown>>[],
       ]
-    >
+    >;
 
 // todo: use variants or ensure a singleone
 export function subcommand<TSchema extends Subcommand>(
   schema: TSchema,
-  subcommand: Omit<ArgSubcommandMetadata, "type">
+  subcommand: Omit<ArgSubcommandMetadata, "type">,
 ) {
-  return arg(schema, { type: "subcommand", ...subcommand })
+  return arg(schema, { type: "subcommand", ...subcommand });
 }

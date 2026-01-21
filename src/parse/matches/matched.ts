@@ -1,53 +1,53 @@
-import { Only } from "../../utils/only.js"
-import { ArgsToken, OptionToken, ValueToken } from "../tokens/args.js"
-import { Unmatches, UnmatchesLeaf } from "../unmatches.js"
-import { getMatchForValue } from "./match.js"
-import { Matches } from "./matches.js"
-import { getUnmatchForOption, getUnmatchForValue } from "./unmatch.js"
+import type { Only } from "../../utils/only.js";
+import type { ArgsToken, OptionToken, ValueToken } from "../tokens/args.js";
+import type { Unmatches, UnmatchesLeaf } from "../unmatches.js";
+import { getMatchForValue } from "./match.js";
+import type { Matches } from "./matches.js";
+import { getUnmatchForOption, getUnmatchForValue } from "./unmatch.js";
 
 export type Matched =
   | { type: "previous"; unmatch: UnmatchesLeaf }
-  | { type: "matched"; match: string | boolean; unmatch: UnmatchesLeaf }
+  | { type: "matched"; match: string | boolean; unmatch: UnmatchesLeaf };
 
 export interface GetMatchedInputs {
-  matches: Matches
-  previous: Only<UnmatchesLeaf>
-  unmatches: Unmatches
+  matches: Matches;
+  previous: Only<UnmatchesLeaf>;
+  unmatches: Unmatches;
 }
 
 export function getMatched(
   token: ArgsToken,
-  inputs: GetMatchedInputs
+  inputs: GetMatchedInputs,
 ): Matched {
   switch (token.type) {
     case "option": {
-      return getMatchedForOption(token, inputs)
+      return getMatchedForOption(token, inputs);
     }
 
     case "value": {
-      return getMatchedForValue(token, inputs)
+      return getMatchedForValue(token, inputs);
     }
 
     default:
-      throw new Error()
+      throw new Error();
   }
 }
 
 export function getMatchedForOption(
   token: OptionToken,
-  inputs: GetMatchedInputs
+  inputs: GetMatchedInputs,
 ): Matched {
-  const unmatch = getUnmatchForOption(inputs.unmatches, token)
+  const unmatch = getUnmatchForOption(inputs.unmatches, token);
 
   // `--<identifier>=<value>`
   if (token.value !== undefined) {
-    const match = getMatchForValue(unmatch, token)
+    const match = getMatchForValue(unmatch, token);
 
     return {
       type: "matched",
       unmatch,
-      match
-    }
+      match,
+    };
   }
 
   // `--<identifier>`
@@ -56,31 +56,31 @@ export function getMatchedForOption(
     return {
       type: "matched",
       unmatch,
-      match: true
-    }
+      match: true,
+    };
   }
 
   // schema expects this to have a value
   // `--identifier [value]`
   return {
     type: "previous",
-    unmatch
-  }
+    unmatch,
+  };
 }
 
 export function getMatchedForValue(
   token: ValueToken,
-  inputs: GetMatchedInputs
+  inputs: GetMatchedInputs,
 ): Matched {
   const unmatch =
     inputs.previous.get() ??
-    getUnmatchForValue(inputs.matches, inputs.unmatches)
+    getUnmatchForValue(inputs.matches, inputs.unmatches);
 
-  const match = getMatchForValue(unmatch, token)
+  const match = getMatchForValue(unmatch, token);
 
   return {
     type: "matched",
     match,
-    unmatch
-  }
+    unmatch,
+  };
 }

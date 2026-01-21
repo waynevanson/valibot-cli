@@ -1,42 +1,42 @@
-import {
-  ValueToken,
+import type {
+  OptionLongValueToken,
   OptionsShortValueToken,
-  OptionLongValueToken
-} from "../tokens/args.js"
-import {
-  UnmatchesNodeString,
+  ValueToken,
+} from "../tokens/args.js";
+import type {
+  UnmatchesNodeArray,
   UnmatchesNodeBoolean,
-  UnmatchesNodeArray
-} from "../unmatches.js"
+  UnmatchesNodeString,
+} from "../unmatches.js";
 
 export function getMatchForValue(
   unmatch: UnmatchesNodeString | UnmatchesNodeBoolean | UnmatchesNodeArray,
-  token: ValueToken | OptionsShortValueToken | OptionLongValueToken
+  token: ValueToken | OptionsShortValueToken | OptionLongValueToken,
 ): string | boolean {
   switch (unmatch.type) {
     case "boolean": {
-      return deriveBooleanFromValue(token.value)
+      return deriveBooleanFromValue(token.value);
     }
 
     case "string":
     case "array": {
-      return token.value
+      return token.value;
     }
 
     default: {
-      throw new Error()
+      throw new Error();
     }
   }
 }
 
 export function deriveBooleanFromValue(value: string) {
   if (value == "true" || value == "1") {
-    return true
+    return true;
   }
 
   if (value == "false" || value == "0") {
-    return false
+    return false;
   }
 
-  throw new Error()
+  throw new Error();
 }
