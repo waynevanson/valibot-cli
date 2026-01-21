@@ -1,11 +1,7 @@
-import { match } from "assert";
-import { type } from "os";
-import { ref } from "process";
-import { symbol, set, value, string, boolean, values } from "valibot";
 import { Only } from "../../utils/only.js";
-import { ArgsTokens } from "../tokens/args.js";
+import type { ArgsTokens } from "../tokens/args.js";
 import type { Unmatches, UnmatchesLeaf } from "../unmatches.js";
-import { GetMatchedInputs, getMatched } from "./matched.js";
+import { type GetMatchedInputs, getMatched } from "./matched.js";
 
 export type Match = string | boolean | Array<string>;
 
