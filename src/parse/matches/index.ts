@@ -3,6 +3,7 @@ import {
   ArgOptionMetadata,
   ArgValueMetadata
 } from "../../methods/arg-metadata.js"
+import { Only } from "../../utils/only.js"
 import {
   ArgsToken,
   ArgsTokens,
@@ -18,34 +19,55 @@ import {
   UnmatchesNodeBoolean,
   UnmatchesNodeString
 } from "../unmatches.js"
-import { Matches, MatchesState } from "./matches-state.js"
-import { Only } from "../../utils/only.js"
+import { Matches } from "./matches-state.js"
 
 export function createMatches(
   unmatches: Unmatches,
   tokens: ArgsTokens
 ): Matches {
-  const state = tokens.reduce((state, token) => walk(state, token, unmatches), {
-    matches: new Matches(),
-    previous: new Only<UnmatchesLeaf>()
-  } satisfies MatchesState)
+  const matches = new Matches()
+  const previous = new Only<UnmatchesLeaf>()
 
-  const prev = state.previous.get()
+  for (const token of tokens) {
+    const matched = getMatched(matches, previous, token, unmatches)
 
-  if (prev !== undefined) {
-    // no more tokens, resolve the optional flag
-    state.matches.set(prev.ref, true)
+    switch (matched.type) {
+      case "previous": {
+        previous.set(matched.unmatch)
+        break
+      }
+      case "matched": {
+        matches.add(matched.unmatch, matched.match)
+        break
+      }
+      default: {
+        throw new Error()
+      }
+    }
   }
 
-  return state.matches
+  const unmatch = previous.get()
+
+  if (unmatch !== undefined) {
+    // no more tokens, resolve the optional flag
+    matches.set(unmatch.ref, true)
+  }
+
+  return matches
 }
 
+type Matched =
+  | { type: "previous"; unmatch: UnmatchesLeaf }
+  | { type: "matched"; match: string | boolean; unmatch: UnmatchesLeaf }
+
 // adding to matches only once
-function walk(
-  state: MatchesState,
+// todo: values
+function getMatched(
+  matches: Matches,
+  previous: Only<UnmatchesLeaf>,
   token: ArgsToken,
   unmatches: Unmatches
-): MatchesState {
+): Matched {
   switch (token.type) {
     case "option": {
       const unmatch = getNodeForOptionString(unmatches, token)
@@ -55,38 +77,46 @@ function walk(
 
         // todo: booleans where values are optional
         if (unmatch.type === "boolean" && unmatch.value !== "required") {
-          state.matches.set(unmatch.ref, true)
+          return {
+            type: "matched",
+            unmatch,
+            match: true
+          }
         } else {
-          state.previous.set(unmatch)
+          return {
+            type: "previous",
+            unmatch
+          }
         }
       } else {
         // todo: push a value into the matches
         // `--<identifier>=<value>`
         const match = createMatchValue(unmatch, token)
 
-        // refactor this into something probably
-        state.matches.add(unmatch, match)
+        return {
+          type: "matched",
+          unmatch,
+          match
+        }
       }
-
-      break
     }
 
     case "value": {
       const unmatch =
-        state.previous.get() ?? getNodeValueForString(state.matches, unmatches)
+        previous.get() ?? getNodeValueForString(matches, unmatches)
 
       const match = createMatchValue(unmatch, token)
 
-      state.matches.add(unmatch, match)
-
-      break
+      return {
+        type: "matched",
+        match,
+        unmatch
+      }
     }
 
     default:
       throw new Error()
   }
-
-  return state
 }
 
 function createMatchValue(
