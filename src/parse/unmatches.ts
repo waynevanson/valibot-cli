@@ -33,10 +33,24 @@ export type UnmatchArray = {
   metadata: ArgOptionMetadata | ArgValueMetadata;
 };
 
+export type UnmatchOptional = {
+  ref: symbol;
+  wrapped: {
+    type: "string";
+  };
+  type: "optional";
+  default: string | undefined;
+  metadata: ArgOptionMetadata;
+};
+
 export type UnmatchArrayItem = { type: "string" } | { type: "boolean" };
 
 export type UunmatchBranch = UnmatchStrictTuple;
-export type UnmatchLeaf = UnmatchString | UnmatchBoolean | UnmatchArray;
+export type UnmatchLeaf =
+  | UnmatchString
+  | UnmatchBoolean
+  | UnmatchArray
+  | UnmatchOptional;
 
 export type Unmatch = UunmatchBranch | UnmatchLeaf;
 
@@ -73,9 +87,17 @@ function construct(schema: ParsableSchema): Unmatch {
       return { type: schema.type, ref, value: "required", metadata };
     }
 
-    case "strict_tuple": {
-      const items = schema.items.map((item) => construct(item as never));
-      return { type: schema.type, ref, items };
+    case "optional": {
+      const metadata = getArgMethodMetadata(schema);
+      return {
+        type: "optional",
+        default: schema.default,
+        ref,
+        wrapped: {
+          type: "string",
+        },
+        metadata,
+      };
     }
 
     case "array": {
@@ -88,6 +110,11 @@ function construct(schema: ParsableSchema): Unmatch {
         ref,
         metadata,
       };
+    }
+
+    case "strict_tuple": {
+      const items = schema.items.map((item) => construct(item as never));
+      return { type: schema.type, ref, items };
     }
 
     default: {
@@ -103,7 +130,8 @@ function find(
   switch (unmatches.type) {
     case "array":
     case "string":
-    case "boolean": {
+    case "boolean":
+    case "optional": {
       if (predicate(unmatches)) {
         return unmatches;
       }

@@ -274,7 +274,20 @@ const fixtures = [
       },
     ],
   }),
-
+  fixture({
+    name: "option(optional(string))",
+    schema: c.option(v.optional(v.string()), {
+      name: "out-file",
+      longs: ["out-file"],
+      shorts: ["o"],
+    }),
+    cases: [
+      {
+        argv: ["--out-file=/path/to/out-file.txt"],
+        expected: "/path/to/out-file.txt",
+      },
+    ],
+  }),
   // fixture({
   //   name: "subcommand('a' | 'b')",
   //   only:true,

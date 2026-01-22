@@ -8,6 +8,10 @@ export type OptionSchema =
       | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
       | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
       v.ErrorMessage<v.ArrayIssue> | undefined
+    >
+  | v.OptionalSchema<
+      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+      string | undefined
     >;
 
 // todo: kebab-case

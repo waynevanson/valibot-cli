@@ -76,6 +76,10 @@ export class Matches {
           throw new Error();
         }
         break;
+
+      case "optional": {
+        return value;
+      }
       default: {
         throw new Error();
       }

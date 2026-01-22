@@ -3,14 +3,10 @@ import type {
   OptionsShortValueToken,
   ValueToken,
 } from "../tokens/index.js";
-import type {
-  UnmatchArray,
-  UnmatchBoolean,
-  UnmatchString,
-} from "../unmatches.js";
+import type { UnmatchLeaf } from "../unmatches.js";
 
 export function getMatchForValue(
-  unmatch: UnmatchString | UnmatchBoolean | UnmatchArray,
+  unmatch: UnmatchLeaf,
   token: ValueToken | OptionsShortValueToken | OptionLongValueToken,
 ): string | boolean {
   switch (unmatch.type) {
@@ -19,6 +15,7 @@ export function getMatchForValue(
     }
 
     case "string":
+    case "optional":
     case "array": {
       return token.value;
     }
