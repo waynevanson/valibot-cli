@@ -286,6 +286,10 @@ const fixtures = [
         argv: ["--out-file=/path/to/out-file.txt"],
         expected: "/path/to/out-file.txt",
       },
+      {
+        argv: [],
+        expected: undefined,
+      },
     ],
   }),
   // fixture({
