@@ -12,6 +12,10 @@ export type OptionSchema =
   | v.OptionalSchema<
       v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
       string | undefined
+    >
+  | v.NullableSchema<
+      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+      string | null | undefined
     >;
 
 // todo: kebab-case

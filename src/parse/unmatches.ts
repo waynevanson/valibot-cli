@@ -43,6 +43,16 @@ export type UnmatchOptional = {
   metadata: ArgOptionMetadata;
 };
 
+export type UnmatchNullable = {
+  ref: symbol;
+  wrapped: {
+    type: "string";
+  };
+  type: "nullable";
+  default: string | null;
+  metadata: ArgOptionMetadata;
+};
+
 export type UnmatchArrayItem = { type: "string" } | { type: "boolean" };
 
 export type UunmatchBranch = UnmatchStrictTuple;
@@ -50,7 +60,8 @@ export type UnmatchLeaf =
   | UnmatchString
   | UnmatchBoolean
   | UnmatchArray
-  | UnmatchOptional;
+  | UnmatchOptional
+  | UnmatchNullable;
 
 export type Unmatch = UunmatchBranch | UnmatchLeaf;
 
@@ -100,6 +111,20 @@ function construct(schema: ParsableSchema): Unmatch {
       };
     }
 
+    case "nullable": {
+      const metadata = getArgMethodMetadata(schema);
+
+      return {
+        type: "nullable",
+        default: schema.default ?? null,
+        ref,
+        wrapped: {
+          type: "string",
+        },
+        metadata,
+      };
+    }
+
     case "array": {
       const metadata = getArgMethodMetadata(schema);
       return {
@@ -131,7 +156,8 @@ function find(
     case "array":
     case "string":
     case "boolean":
-    case "optional": {
+    case "optional":
+    case "nullable": {
       if (predicate(unmatches)) {
         return unmatches;
       }

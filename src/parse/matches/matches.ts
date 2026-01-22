@@ -77,7 +77,8 @@ export class Matches {
         }
         break;
 
-      case "optional": {
+      case "optional":
+      case "nullable": {
         return value;
       }
       default: {

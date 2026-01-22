@@ -2,7 +2,12 @@ import type { Matches } from "./matches/index.js";
 import type { ParsableSchema } from "./parse.js";
 import type { Unmatch, Unmatches } from "./unmatches.js";
 
-export type BuildOutput = Array<BuildOutput> | string | boolean | undefined;
+export type BuildOutput =
+  | Array<BuildOutput>
+  | string
+  | boolean
+  | undefined
+  | null;
 
 export function build(
   unmatches: Unmatches<ParsableSchema>,
@@ -32,7 +37,8 @@ export function build(
         return tuple;
       }
 
-      case "optional": {
+      case "optional":
+      case "nullable": {
         return matches.has(unmatch.ref)
           ? matches.getByType(unmatch.ref, unmatch.type)
           : unmatch.default;

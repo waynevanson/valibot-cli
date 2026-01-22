@@ -292,6 +292,24 @@ const fixtures = [
       },
     ],
   }),
+  fixture({
+    name: "option(nullable(string))",
+    schema: c.option(v.nullable(v.string()), {
+      name: "out-file",
+      longs: ["out-file"],
+      shorts: ["o"],
+    }),
+    cases: [
+      {
+        argv: ["--out-file=/path/to/out-file.txt"],
+        expected: "/path/to/out-file.txt",
+      },
+      {
+        argv: [],
+        expected: null,
+      },
+    ],
+  }),
   // fixture({
   //   name: "subcommand('a' | 'b')",
   //   only:true,

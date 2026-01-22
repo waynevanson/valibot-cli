@@ -43,6 +43,13 @@ export type ParsableSchema =
         string | undefined
       >,
       ArgOptionMetadata
+    >
+  | ArgMethod<
+      v.NullableSchema<
+        v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+        string | undefined
+      >,
+      ArgOptionMetadata
     >;
 
 export function parse<TSchema extends ParsableSchema>(
