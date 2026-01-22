@@ -293,6 +293,24 @@ const fixtures = [
     ],
   }),
   fixture({
+    name: "option(nullable(string, 'hello'))",
+    schema: c.option(v.optional(v.string(), "hello"), {
+      name: "out-file",
+      longs: ["out-file"],
+      shorts: ["o"],
+    }),
+    cases: [
+      {
+        argv: ["--out-file=/path/to/out-file.txt"],
+        expected: "/path/to/out-file.txt",
+      },
+      {
+        argv: [],
+        expected: "hello",
+      },
+    ],
+  }),
+  fixture({
     name: "option(nullable(string))",
     schema: c.option(v.nullable(v.string()), {
       name: "out-file",
@@ -307,6 +325,24 @@ const fixtures = [
       {
         argv: [],
         expected: null,
+      },
+    ],
+  }),
+  fixture({
+    name: "option(nullable(string, 'hello'))",
+    schema: c.option(v.nullable(v.string(), "hello"), {
+      name: "out-file",
+      longs: ["out-file"],
+      shorts: ["o"],
+    }),
+    cases: [
+      {
+        argv: ["--out-file=/path/to/out-file.txt"],
+        expected: "/path/to/out-file.txt",
+      },
+      {
+        argv: [],
+        expected: "hello",
       },
     ],
   }),
@@ -334,18 +370,20 @@ describe(c.parse.name, () => {
       (case_) => [case_.argv.join(" "), case_] as const,
     );
 
-    test.skipIf(skippable && !fixture.only).each(cases)(
+    describe.skipIf(skippable && !fixture.only).each(cases)(
       "%s",
       (_name, case_) => {
-        // parse = argv + schema
-        const parsed = c.parse(fixture.schema, case_.argv);
-        expect(parsed).toStrictEqual(case_.expected);
+        test(case_.expected?.toString() ?? "", () => {
+          // parse = argv + schema
+          const parsed = c.parse(fixture.schema, case_.argv);
+          expect(parsed).toStrictEqual(case_.expected);
 
-        // validate = parsed + schema
-        const validated = v.safeParse(fixture.schema, parsed);
-        expect(validated).containSubset({
-          issues: undefined,
-          success: true,
+          // validate = parsed + schema
+          const validated = v.safeParse(fixture.schema, parsed);
+          expect(validated).containSubset({
+            issues: undefined,
+            success: true,
+          });
         });
       },
     );
