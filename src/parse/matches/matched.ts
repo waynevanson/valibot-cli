@@ -16,6 +16,7 @@ export interface GetMatchedInputs {
   unmatches: Unmatches<ParsableSchema>;
 }
 
+// get the value from the token and coerce it to a datatype
 export function getMatched(
   token: ArgsToken,
   inputs: GetMatchedInputs,
@@ -75,6 +76,7 @@ export function getMatchedForValue(
   token: ValueToken,
   inputs: GetMatchedInputs,
 ): Matched {
+  // TokenOption requires identifier which go on previous token.
   const unmatch =
     inputs.previous.get() ??
     inputs.unmatches.find((leaf) => isUnmatchForValue(leaf, inputs.matches));
