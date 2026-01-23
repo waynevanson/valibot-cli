@@ -55,7 +55,12 @@ export type UnmatchNullable = {
 
 export type UnmatchArrayItem = { type: "string" } | { type: "boolean" };
 
-export type UunmatchBranch = UnmatchStrictTuple;
+export type UnmatchObject = {
+  type: "object";
+  entries: Record<string, Unmatch>;
+};
+
+export type UunmatchBranch = UnmatchStrictTuple | UnmatchObject;
 export type UnmatchLeaf =
   | UnmatchString
   | UnmatchBoolean
@@ -142,6 +147,16 @@ function construct(schema: ParsableSchema): Unmatch {
       return { type: schema.type, ref, items };
     }
 
+    case "object": {
+      const entries = {} as Record<string, Unmatch>;
+
+      for (const name in schema.entries) {
+        entries[name] = construct(schema.entries[name]);
+      }
+
+      return { type: "object", entries };
+    }
+
     default: {
       throw new Error();
     }
@@ -168,6 +183,18 @@ function find(
     case "strict_tuple": {
       for (const item of unmatches.items) {
         const unmatch = find(item, predicate);
+
+        if (unmatch !== undefined) {
+          return unmatch;
+        }
+      }
+
+      break;
+    }
+
+    case "object": {
+      for (const name in unmatches.entries) {
+        const unmatch = find(unmatches.entries[name], predicate);
 
         if (unmatch !== undefined) {
           return unmatch;

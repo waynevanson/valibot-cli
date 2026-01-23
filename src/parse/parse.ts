@@ -50,6 +50,10 @@ export type ParsableSchema =
         string | undefined
       >,
       ArgOptionMetadata
+    >
+  | v.ObjectSchema<
+      Record<string, ParsableSchemaPrimitive>,
+      v.ErrorMessage<v.ObjectIssue> | undefined
     >;
 
 export function parse<TSchema extends ParsableSchema>(

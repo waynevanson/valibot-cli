@@ -7,7 +7,8 @@ export type BuildOutput =
   | string
   | boolean
   | undefined
-  | null;
+  | null
+  | { [name: string]: BuildOutput };
 
 export function build(
   unmatches: Unmatches<ParsableSchema>,
@@ -35,6 +36,16 @@ export function build(
         }
 
         return tuple;
+      }
+
+      case "object": {
+        const object: BuildOutput = {};
+
+        for (const name in unmatch.entries) {
+          object[name] = walk(unmatch.entries[name]);
+        }
+
+        return object;
       }
 
       case "optional":
