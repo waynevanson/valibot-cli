@@ -22,9 +22,8 @@ export type OptionSchema =
       string | null | undefined
     >;
 
-// todo: kebab-case
 const long = v.pipe(v.string(), v.regex(/^\w+(-\w+)*$/));
-const short = v.pipe(v.string(), v.minLength(1), v.maxLength(1));
+const short = v.pipe(v.string(), v.regex(/^\w$/));
 
 const shorts = v.object({
   shorts: v.tupleWithRest([short], short),
