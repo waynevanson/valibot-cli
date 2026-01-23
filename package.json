@@ -27,7 +27,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --project tsconfig.build.json"
+    "build": "tsc --project tsconfig.build.json",
+    "prepare": "husky"
   },
   "dependencies": {
     "valibot": "^1.2.0"
@@ -37,6 +38,8 @@
     "@types/node": "^24.10.4",
     "@vitest/coverage-v8": "4.0.16",
     "fast-check": "^4.5.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "valibot-fast-check": "^0.1.1",
