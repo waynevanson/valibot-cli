@@ -359,6 +359,19 @@ const fixtures = [
       },
     ],
   }),
+  fixture({
+    name: "strictObject({ force: option(boolean) })",
+    only: true,
+    schema: v.strictObject({
+      force: c.option(v.boolean(), { longs: ["force"], name: "force" }),
+    }),
+    cases: [
+      {
+        argv: ["--force"],
+        expected: { force: true },
+      },
+    ],
+  }),
 ] satisfies ReadonlyArray<Fixture<ParsableSchema>>;
 
 // todo: optional values, objects, subcommand, help

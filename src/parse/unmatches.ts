@@ -60,7 +60,15 @@ export type UnmatchObject = {
   entries: Record<string, Unmatch>;
 };
 
-export type UunmatchBranch = UnmatchStrictTuple | UnmatchObject;
+export type UnmatchStrictObject = {
+  type: "strict_object";
+  entries: Record<string, Unmatch>;
+};
+
+export type UunmatchBranch =
+  | UnmatchStrictTuple
+  | UnmatchObject
+  | UnmatchStrictObject;
 export type UnmatchLeaf =
   | UnmatchString
   | UnmatchBoolean
@@ -147,14 +155,15 @@ function construct(schema: ParsableSchema): Unmatch {
       return { type: schema.type, ref, items };
     }
 
-    case "object": {
+    case "object":
+    case "strict_object": {
       const entries = {} as Record<string, Unmatch>;
 
       for (const name in schema.entries) {
         entries[name] = construct(schema.entries[name]);
       }
 
-      return { type: "object", entries };
+      return { type: schema.type, entries };
     }
 
     default: {
@@ -192,7 +201,8 @@ function find(
       break;
     }
 
-    case "object": {
+    case "object":
+    case "strict_object": {
       for (const name in unmatches.entries) {
         const unmatch = find(unmatches.entries[name], predicate);
 

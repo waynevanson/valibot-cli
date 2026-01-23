@@ -38,6 +38,7 @@ export function build(
         return tuple;
       }
 
+      case "strict_object":
       case "object": {
         const object: BuildOutput = {};
 

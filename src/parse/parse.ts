@@ -54,6 +54,10 @@ export type ParsableSchema =
   | v.ObjectSchema<
       Record<string, ParsableSchemaPrimitive>,
       v.ErrorMessage<v.ObjectIssue> | undefined
+    >
+  | v.StrictObjectSchema<
+      Record<string, ParsableSchemaPrimitive>,
+      v.ErrorMessage<v.StrictObjectIssue> | undefined
     >;
 
 export function parse<TSchema extends ParsableSchema>(
