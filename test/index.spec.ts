@@ -347,6 +347,24 @@ const fixtures = [
     ],
   }),
   fixture({
+    name: "option(exact_optional(string, 'hello'))",
+    schema: c.option(v.exactOptional(v.string()), {
+      name: "out-file",
+      longs: ["out-file"],
+      shorts: ["o"],
+    }),
+    cases: [
+      {
+        argv: ["--out-file=/path/to/out-file.txt"],
+        expected: "/path/to/out-file.txt",
+      },
+      {
+        argv: [],
+        expected: "hello",
+      },
+    ],
+  }),
+  fixture({
     name: "object({ force: option(boolean) })",
     only: true,
     schema: v.object({

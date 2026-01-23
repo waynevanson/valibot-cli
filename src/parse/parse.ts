@@ -45,6 +45,13 @@ export type ParsableSchema =
       ArgOptionMetadata
     >
   | ArgMethod<
+      v.ExactOptionalSchema<
+        v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+        string | undefined
+      >,
+      ArgOptionMetadata
+    >
+  | ArgMethod<
       v.NullableSchema<
         v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
         string | undefined

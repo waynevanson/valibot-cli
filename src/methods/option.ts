@@ -9,6 +9,10 @@ export type OptionSchema =
       | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
       v.ErrorMessage<v.ArrayIssue> | undefined
     >
+  | v.ExactOptionalSchema<
+      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
+      string | undefined
+    >
   | v.OptionalSchema<
       v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
       string | undefined
