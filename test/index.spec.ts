@@ -4,18 +4,19 @@ import * as c from "../src/index.js";
 import { isArgMethod } from "../src/methods/arg-method.js";
 import type { ParsableSchema } from "../src/parse/index.js";
 
-interface Fixture<Schema extends ParsableSchema> {
+interface Fixture2<Schema extends ParsableSchema> {
   name: string;
   schema: Schema;
   cases: ReadonlyArray<{
-    argv: ReadonlyArray<string>;
     expected: v.InferInput<Schema>;
+    argvs: ReadonlyArray<ReadonlyArray<string>>;
   }>;
-  only?: boolean;
 }
 
 function createFixtures<Schemas extends ReadonlyArray<ParsableSchema>>(
-  fixtures: { [P in keyof Schemas]: Fixture<Schemas[P]> },
+  fixtures: {
+    [P in keyof Schemas]: Fixture2<Schemas[P]>;
+  },
 ) {
   return fixtures;
 }
@@ -139,27 +140,27 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--greeting=hello"],
+        argvs: [["--greeting=hello"]],
         expected: "hello",
       },
       {
-        argv: ["--greeting", "hello"],
+        argvs: [["--greeting", "hello"]],
         expected: "hello",
       },
       {
-        argv: ["--quote=hello"],
+        argvs: [["--quote=hello"]],
         expected: "hello",
       },
       {
-        argv: ["--quote", "hello"],
+        argvs: [["--quote", "hello"]],
         expected: "hello",
       },
       {
-        argv: ["-q=hello"],
+        argvs: [["-q=hello"]],
         expected: "hello",
       },
       {
-        argv: ["-q", "hello"],
+        argvs: [["-q", "hello"]],
         expected: "hello",
       },
     ],
@@ -172,11 +173,11 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--greeting=hello"],
+        argvs: [["--greeting=hello"]],
         expected: "hello",
       },
       {
-        argv: ["--greeting", "hello"],
+        argvs: [["--greeting", "hello"]],
         expected: "hello",
       },
     ],
@@ -189,7 +190,7 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["-g=hello"],
+        argvs: [["-g=hello"]],
         expected: "hello",
       },
     ],
@@ -204,11 +205,11 @@ const fixtures = createFixtures([
     ]),
     cases: [
       {
-        argv: ["--greeting=hello"],
+        argvs: [["--greeting=hello"]],
         expected: ["hello"],
       },
       {
-        argv: ["--greeting", "hello"],
+        argvs: [["--greeting", "hello"]],
         expected: ["hello"],
       },
     ],
@@ -218,7 +219,7 @@ const fixtures = createFixtures([
     schema: c.value(v.string(), {
       name: "greeting",
     }),
-    cases: [{ argv: ["hello"], expected: "hello" }],
+    cases: [{ argvs: [["hello"]], expected: "hello" }],
   },
   {
     name: "strict_tuple([value(string)]) positional",
@@ -227,7 +228,7 @@ const fixtures = createFixtures([
         name: "greeting",
       }),
     ]),
-    cases: [{ argv: ["hello"], expected: ["hello"] }],
+    cases: [{ argvs: [["hello"]], expected: ["hello"] }],
   },
   {
     name: "strict_tuple([value(string), value(string)]) positional",
@@ -241,7 +242,7 @@ const fixtures = createFixtures([
     ]),
     cases: [
       {
-        argv: ["hello", "jayson"],
+        argvs: [["hello", "jayson"]],
         expected: ["hello", "jayson"],
       },
     ],
@@ -259,23 +260,23 @@ const fixtures = createFixtures([
     ]),
     cases: [
       {
-        argv: ["hello", "--user", "jayson"],
+        argvs: [["hello", "--user", "jayson"]],
         expected: ["hello", "jayson"],
       },
       {
-        argv: ["hello", "--user=jayson"],
+        argvs: [["hello", "--user=jayson"]],
         expected: ["hello", "jayson"],
       },
       {
-        argv: ["hello", "--person=jayson"],
+        argvs: [["hello", "--person=jayson"]],
         expected: ["hello", "jayson"],
       },
       {
-        argv: ["--person=jayson", "hello"],
+        argvs: [["--person=jayson", "hello"]],
         expected: ["hello", "jayson"],
       },
       {
-        argv: ["--person", "jayson", "hello"],
+        argvs: [["--person", "jayson", "hello"]],
         expected: ["hello", "jayson"],
       },
     ],
@@ -289,39 +290,39 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--force"],
+        argvs: [["--force"]],
         expected: true,
       },
       {
-        argv: ["--force=true"],
+        argvs: [["--force=true"]],
         expected: true,
       },
       {
-        argv: ["--force=false"],
+        argvs: [["--force=false"]],
         expected: false,
       },
       {
-        argv: ["--force=1"],
+        argvs: [["--force=1"]],
         expected: true,
       },
       {
-        argv: ["--force=0"],
+        argvs: [["--force=0"]],
         expected: false,
       },
       {
-        argv: ["--force", "true"],
+        argvs: [["--force", "true"]],
         expected: true,
       },
       {
-        argv: ["--force", "false"],
+        argvs: [["--force", "false"]],
         expected: false,
       },
       {
-        argv: ["--force", "1"],
+        argvs: [["--force", "1"]],
         expected: true,
       },
       {
-        argv: ["--force", "0"],
+        argvs: [["--force", "0"]],
         expected: false,
       },
     ],
@@ -335,27 +336,27 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--features=feature-1,feature-2"],
+        argvs: [["--features=feature-1,feature-2"]],
         expected: ["feature-1", "feature-2"],
       },
       {
-        argv: ["--features=feature-1", "--features=feature-2"],
+        argvs: [["--features=feature-1", "--features=feature-2"]],
         expected: ["feature-1", "feature-2"],
       },
       {
-        argv: ["--features", "feature-1"],
+        argvs: [["--features", "feature-1"]],
         expected: ["feature-1"],
       },
       {
-        argv: ["--features", "feature-1", "--features", "feature-2"],
+        argvs: [["--features", "feature-1", "--features", "feature-2"]],
         expected: ["feature-1", "feature-2"],
       },
       {
-        argv: ["--features", "feature-1", "--features=feature-2"],
+        argvs: [["--features", "feature-1", "--features=feature-2"]],
         expected: ["feature-1", "feature-2"],
       },
       {
-        argv: ["--features=feature-1", "--features", "feature-2"],
+        argvs: [["--features=feature-1", "--features", "feature-2"]],
         expected: ["feature-1", "feature-2"],
       },
     ],
@@ -367,19 +368,19 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["feature-1"],
+        argvs: [["feature-1"]],
         expected: ["feature-1"],
       },
       {
-        argv: ["feature-1", "feature-2"],
+        argvs: [["feature-1", "feature-2"]],
         expected: ["feature-1", "feature-2"],
       },
       {
-        argv: ["feature-1,feature2"],
+        argvs: [["feature-1,feature2"]],
         expected: ["feature-1,feature2"],
       },
       {
-        argv: [],
+        argvs: [[]],
         expected: [],
       },
     ],
@@ -393,11 +394,11 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--out-file=/path/to/out-file.txt"],
+        argvs: [["--out-file=/path/to/out-file.txt"]],
         expected: "/path/to/out-file.txt",
       },
       {
-        argv: [],
+        argvs: [[]],
         expected: undefined,
       },
     ],
@@ -411,11 +412,11 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--out-file=/path/to/out-file.txt"],
+        argvs: [["--out-file=/path/to/out-file.txt"]],
         expected: "/path/to/out-file.txt",
       },
       {
-        argv: [],
+        argvs: [[]],
         expected: "hello",
       },
     ],
@@ -429,11 +430,11 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--out-file=/path/to/out-file.txt"],
+        argvs: [["--out-file=/path/to/out-file.txt"]],
         expected: "/path/to/out-file.txt",
       },
       {
-        argv: [],
+        argvs: [[]],
         expected: null,
       },
     ],
@@ -447,11 +448,11 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--out-file=/path/to/out-file.txt"],
+        argvs: [["--out-file=/path/to/out-file.txt"]],
         expected: "/path/to/out-file.txt",
       },
       {
-        argv: [],
+        argvs: [[]],
         expected: "hello",
       },
     ],
@@ -465,11 +466,11 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--out-file=/path/to/out-file.txt"],
+        argvs: [["--out-file=/path/to/out-file.txt"]],
         expected: "/path/to/out-file.txt",
       },
       {
-        argv: ["--out-file"],
+        argvs: [["--out-file"]],
         expected: "hello",
       },
     ],
@@ -481,7 +482,7 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--force"],
+        argvs: [["--force"]],
         expected: { force: true },
       },
     ],
@@ -493,7 +494,7 @@ const fixtures = createFixtures([
     }),
     cases: [
       {
-        argv: ["--force"],
+        argvs: [["--force"]],
         expected: { force: true },
       },
     ],
@@ -502,36 +503,32 @@ const fixtures = createFixtures([
 
 // todo: more objects, subcommand, help
 describe(c.parse.name, () => {
-  const skippable = fixtures.some((a) => a.only);
-  const fixes = fixtures.map(
-    (fixture) =>
-      [
-        createFixtureName(fixture.schema),
-        { schema: fixture.schema, cases: fixture.cases, only: fixture.only },
-      ] as const,
-  );
+  for (const fixture of fixtures) {
+    const name = createFixtureName(fixture.schema);
 
-  describe.each(fixes)("%s", (_name, fixture) => {
-    const cases = fixture.cases.map(
-      (case_) => [stringify(case_.argv), case_] as const,
-    );
+    describe(name, () => {
+      for (const case_ of fixture.cases) {
+        const name = stringify(case_.expected);
 
-    describe.skipIf(skippable && !fixture.only).each(cases)(
-      "%s",
-      (_name, case_) => {
-        test(stringify(case_.expected), () => {
-          // parse = argv + schema
-          const parsed = c.parse(fixture.schema, case_.argv);
-          expect(parsed).toStrictEqual(case_.expected);
+        describe(name, () => {
+          for (const argv of case_.argvs) {
+            const name = stringify(argv);
 
-          // validate = parsed + schema
-          const validated = v.safeParse(fixture.schema, parsed);
-          expect(validated).containSubset({
-            issues: undefined,
-            success: true,
-          });
+            test(name, () => {
+              // parse = argv + schema
+              const parsed = c.parse(fixture.schema, argv);
+              expect(parsed).toStrictEqual(case_.expected);
+              ``;
+              // validate = parsed + schema
+              const validated = v.safeParse(fixture.schema, parsed);
+              expect(validated).containSubset({
+                issues: undefined,
+                success: true,
+              });
+            });
+          }
         });
-      },
-    );
-  });
+      }
+    });
+  }
 });
