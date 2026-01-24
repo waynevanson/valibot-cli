@@ -17,8 +17,14 @@ interface Fixture<Schema extends ParsableSchema> {
   only?: boolean;
 }
 
-const fixtures = [
-  fixture({
+function createFixtures<Schemas extends ReadonlyArray<ParsableSchema>>(
+  fixtures: { [P in keyof Schemas]: Fixture<Schemas[P]> },
+) {
+  return fixtures;
+}
+
+const fixtures = createFixtures([
+  {
     name: "option(string) long shorts aliases",
 
     schema: c.option(v.string(), {
@@ -53,8 +59,8 @@ const fixtures = [
         expected: "hello",
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(string) long",
     schema: c.option(v.string(), {
       name: "greeting",
@@ -70,8 +76,8 @@ const fixtures = [
         expected: "hello",
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(string) short",
     schema: c.option(v.string(), {
       name: "greeting",
@@ -83,8 +89,8 @@ const fixtures = [
         expected: "hello",
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "strict_tuple([option(string)]) long",
     schema: v.strictTuple([
       c.option(v.string(), {
@@ -102,15 +108,15 @@ const fixtures = [
         expected: ["hello"],
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "value([string]) positional",
     schema: c.value(v.string(), {
       name: "greeting",
     }),
     cases: [{ argv: ["hello"], expected: "hello" }],
-  }),
-  fixture({
+  },
+  {
     name: "strict_tuple([value(string)]) positional",
     schema: v.strictTuple([
       c.value(v.string(), {
@@ -118,8 +124,8 @@ const fixtures = [
       }),
     ]),
     cases: [{ argv: ["hello"], expected: ["hello"] }],
-  }),
-  fixture({
+  },
+  {
     name: "strict_tuple([value(string), value(string)]) positional",
     schema: v.strictTuple([
       c.value(v.string(), {
@@ -135,8 +141,8 @@ const fixtures = [
         expected: ["hello", "jayson"],
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "strict_tuple([value(string), option(string)]) positional",
     schema: v.strictTuple([
       c.value(v.string(), {
@@ -169,8 +175,8 @@ const fixtures = [
         expected: ["hello", "jayson"],
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(boolean) flag",
     schema: c.option(v.boolean(), {
       name: "force",
@@ -215,8 +221,8 @@ const fixtures = [
         expected: false,
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(array(string))",
     schema: c.option(v.array(v.string()), {
       name: "features",
@@ -249,8 +255,8 @@ const fixtures = [
         expected: ["feature-1", "feature-2"],
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "value(array(string))",
     schema: c.value(v.array(v.string()), {
       name: "features",
@@ -273,8 +279,8 @@ const fixtures = [
         expected: [],
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(optional(string))",
     schema: c.option(v.optional(v.string()), {
       name: "out-file",
@@ -291,8 +297,8 @@ const fixtures = [
         expected: undefined,
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(nullable(string, 'hello'))",
     schema: c.option(v.optional(v.string(), "hello"), {
       name: "out-file",
@@ -309,8 +315,8 @@ const fixtures = [
         expected: "hello",
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(nullable(string))",
     schema: c.option(v.nullable(v.string()), {
       name: "out-file",
@@ -327,8 +333,8 @@ const fixtures = [
         expected: null,
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(nullable(string, 'hello'))",
     schema: c.option(v.nullable(v.string(), "hello"), {
       name: "out-file",
@@ -345,8 +351,8 @@ const fixtures = [
         expected: "hello",
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "option(exact_optional(string, 'hello'))",
     schema: c.option(v.exactOptional(v.string(), "hello"), {
       name: "out-file",
@@ -363,8 +369,8 @@ const fixtures = [
         expected: "hello",
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "object({ force: option(boolean) })",
     schema: v.object({
       force: c.option(v.boolean(), { longs: ["force"], name: "force" }),
@@ -375,8 +381,8 @@ const fixtures = [
         expected: { force: true },
       },
     ],
-  }),
-  fixture({
+  },
+  {
     name: "strictObject({ force: option(boolean) })",
     schema: v.strictObject({
       force: c.option(v.boolean(), { longs: ["force"], name: "force" }),
@@ -387,8 +393,8 @@ const fixtures = [
         expected: { force: true },
       },
     ],
-  }),
-] satisfies ReadonlyArray<Fixture<ParsableSchema>>;
+  },
+]);
 
 // todo: optional values, objects, subcommand, help
 describe(c.parse.name, () => {
