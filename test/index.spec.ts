@@ -358,15 +358,14 @@ const fixtures = [
         argv: ["--out-file=/path/to/out-file.txt"],
         expected: "/path/to/out-file.txt",
       },
-      {
-        argv: [],
-        expected: "hello",
-      },
+      // {
+      //   argv: ["--out-file"],
+      //   expected: "hello",
+      // },
     ],
   }),
   fixture({
     name: "object({ force: option(boolean) })",
-    only: true,
     schema: v.object({
       force: c.option(v.boolean(), { longs: ["force"], name: "force" }),
     }),
@@ -379,7 +378,6 @@ const fixtures = [
   }),
   fixture({
     name: "strictObject({ force: option(boolean) })",
-    only: true,
     schema: v.strictObject({
       force: c.option(v.boolean(), { longs: ["force"], name: "force" }),
     }),

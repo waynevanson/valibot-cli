@@ -49,6 +49,10 @@ export function build(
         return object;
       }
 
+      case "exact_optional": {
+        return matches.getByType(unmatch.ref, unmatch.type);
+      }
+
       case "optional":
       case "nullable": {
         return matches.has(unmatch.ref)

@@ -16,6 +16,7 @@ export function getMatchForValue(
 
     case "string":
     case "optional":
+    case "exact_optional":
     case "nullable":
     case "array": {
       return token.value;

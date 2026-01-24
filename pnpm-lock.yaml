@@ -15,6 +15,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.3.11
         version: 2.3.11
+      '@fast-check/vitest':
+        specifier: ^0.2.4
+        version: 0.2.4(vitest@4.0.16(@types/node@24.10.4)(yaml@2.8.2))
       '@types/node':
         specifier: ^24.10.4
         version: 24.10.4
@@ -280,6 +283,11 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fast-check/vitest@0.2.4':
+    resolution: {integrity: sha512-Ilcr+JAIPhb1s6FRm4qoglQYSGXXrS+zAupZeNuWAA3qHVGDA1d1Gb84Hb/+otL3GzVZjFJESg5/1SfIvrgssA==}
+    peerDependencies:
+      vitest: ^1 || ^2 || ^3 || ^4
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -1307,6 +1315,11 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.2':
     optional: true
+
+  '@fast-check/vitest@0.2.4(vitest@4.0.16(@types/node@24.10.4)(yaml@2.8.2))':
+    dependencies:
+      fast-check: 4.5.3
+      vitest: 4.0.16(@types/node@24.10.4)(yaml@2.8.2)
 
   '@isaacs/balanced-match@4.0.1': {}
 

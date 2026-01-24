@@ -4,7 +4,7 @@ import type { ArgsTokens } from "../tokens/args.js";
 import type { Unmatches, UnmatchLeaf } from "../unmatches.js";
 import { type GetMatchedInputs, getMatched } from "./matched.js";
 
-export type Match = string | boolean | Array<string>;
+export type Match = string | boolean | Array<string> | undefined;
 
 export function collectMatches(
   matches: Matches,
@@ -42,8 +42,25 @@ export function collectMatches(
   // resolve the flag as a boolean if we had one
   const unmatch = previous.get();
 
-  if (unmatch !== undefined) {
-    matches.set(unmatch.ref, true);
+  if (unmatch === undefined) {
+    return;
+  }
+
+  // `--identifier [value]` but value is missing
+  switch (unmatch.type) {
+    case "boolean": {
+      matches.set(unmatch.ref, true);
+      break;
+    }
+
+    case "exact_optional": {
+      matches.set(unmatch.ref, unmatch.default);
+      break;
+    }
+
+    default: {
+      throw new Error();
+    }
   }
 }
 
@@ -77,6 +94,7 @@ export class Matches {
         }
         break;
 
+      case "exact_optional":
       case "optional":
       case "nullable": {
         return value;
@@ -93,7 +111,7 @@ export class Matches {
     return this.#map.has(ref);
   }
 
-  set(ref: symbol, value: string | boolean) {
+  set(ref: symbol, value: string | boolean | undefined) {
     if (this.#map.has(ref)) {
       throw new Error();
     }

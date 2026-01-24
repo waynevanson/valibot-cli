@@ -1,5 +1,7 @@
 import * as v from "valibot";
 import type { ArgMetadata } from "./arg-metadata.js";
+import type { OptionParsable, OptionSchema } from "./option.js";
+import type { ValueParsable, ValueSchema } from "./value.js";
 
 export const ARG_METADATA = Symbol("ARG_METADATA");
 export type ARG_METADATA = typeof ARG_METADATA;
@@ -13,6 +15,15 @@ export type ArgMethod<
     v.MetadataAction<v.InferOutput<TSchema>, { [ARG_METADATA]: T }>,
   ]
 >;
+
+export type ArgSchema = ValueSchema | OptionSchema;
+
+export type ArgParsable<Schema extends ValueSchema | OptionSchema> =
+  Schema extends ValueSchema
+    ? ValueParsable<Schema>
+    : never | Schema extends OptionSchema
+      ? OptionParsable<Schema>
+      : never;
 
 export function arg<
   TSchema extends v.GenericSchema,

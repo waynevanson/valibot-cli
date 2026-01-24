@@ -1,5 +1,6 @@
 import * as v from "valibot";
-import { arg } from "./arg-method.js";
+import type { ArgOptionMetadata } from "./arg-metadata.js";
+import { type ArgMethod, arg } from "./arg-method.js";
 
 export type OptionSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
@@ -22,6 +23,9 @@ export type OptionSchema =
       string | null | undefined
     >;
 
+export type OptionParsable<Schema extends OptionSchema = OptionSchema> =
+  ArgMethod<Schema, ArgOptionMetadata>;
+
 const long = v.pipe(v.string(), v.regex(/^\w+(-\w+)*$/));
 const short = v.pipe(v.string(), v.regex(/^\w$/));
 
@@ -35,7 +39,7 @@ const longs = v.object({
   longs: v.tupleWithRest([long], long),
 });
 
-const OptionOptions = v.intersect([
+export const OptionOptions = v.intersect([
   v.object({ name: v.pipe(v.string(), v.minLength(1)) }),
   v.union([longs, shorts]),
 ]);

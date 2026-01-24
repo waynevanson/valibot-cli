@@ -2,6 +2,8 @@ import type * as v from "valibot";
 import type {
   ArgMethod,
   ArgOptionMetadata,
+  ArgParsable,
+  ArgSchema,
   ArgValueMetadata,
 } from "../methods/index.js";
 import type { MaybeReadonly } from "../utils/index.js";
@@ -10,6 +12,8 @@ import { Matches } from "./matches/index.js";
 import { collectMatches } from "./matches/matches.js";
 import { ArgsTokens } from "./tokens/args.js";
 import { Unmatches } from "./unmatches.js";
+
+export type ParsableLeaf<Schema extends ArgSchema> = ArgParsable<Schema>;
 
 export type ParsableSchemaPrimitive =
   | ArgMethod<
@@ -34,7 +38,6 @@ export type ParsableSchema =
         | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
         v.ErrorMessage<v.ArrayIssue> | undefined
       >,
-      // todo: ArgValueMetadata
       ArgOptionMetadata | ArgValueMetadata
     >
   | ArgMethod<
