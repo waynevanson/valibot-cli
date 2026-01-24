@@ -39,7 +39,7 @@ function stringify(value: unknown): string {
           entries += name;
           entries += ": ";
           //@ts-expect-error
-          entries += value[name];
+          entries += stringify(value[name]);
           entries += ", ";
         }
 
@@ -500,7 +500,7 @@ const fixtures = createFixtures([
   },
 ]);
 
-// todo: optional values, objects, subcommand, help
+// todo: more objects, subcommand, help
 describe(c.parse.name, () => {
   const skippable = fixtures.some((a) => a.only);
   const fixes = fixtures.map(
