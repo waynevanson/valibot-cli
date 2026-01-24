@@ -3,7 +3,33 @@ import * as c from "../index.js";
 import { isArgMethod } from "../methods/arg-method.js";
 import type { ParsableSchema } from "../parse/parse.js";
 
-export interface Fixture<Schema extends ParsableSchema> {
+export interface FixturesByExpected<
+  Schemas extends ReadonlyArray<ParsableSchema>,
+> {
+  expected: { [P in keyof Schemas]: v.InferInput<Schemas[P]> }[keyof Schemas];
+  cases: {
+    [P in keyof Schemas]: {
+      schema: Schemas[P];
+
+      argvs: readonly [
+        ReadonlyArray<string>,
+        ...ReadonlyArray<ReadonlyArray<string>>,
+      ];
+    };
+  };
+}
+
+export function createFixturesByExpected<
+  FixtureSets extends ReadonlyArray<ReadonlyArray<ParsableSchema>>,
+>(
+  fixtures: {
+    [P in keyof FixtureSets]: FixturesByExpected<FixtureSets[P]>;
+  },
+) {
+  return fixtures;
+}
+
+export interface FixturesBySchema<Schema extends ParsableSchema> {
   schema: Schema;
   cases: ReadonlyArray<{
     expected: v.InferInput<Schema>;
@@ -11,9 +37,11 @@ export interface Fixture<Schema extends ParsableSchema> {
   }>;
 }
 
-export function createFixtures<Schemas extends ReadonlyArray<ParsableSchema>>(
+export function createFixturesBySchema<
+  Schemas extends ReadonlyArray<ParsableSchema>,
+>(
   fixtures: {
-    [P in keyof Schemas]: Fixture<Schemas[P]>;
+    [P in keyof Schemas]: FixturesBySchema<Schemas[P]>;
   },
 ) {
   return fixtures;
@@ -43,6 +71,10 @@ export function stringify(value: unknown): string {
         //@ts-expect-error
         entries += stringify(value[name]);
         entries += ", ";
+      }
+
+      if (Object.keys(value).length > 0) {
+        entries = entries.slice(0, -2);
       }
 
       entries += "}";
@@ -115,6 +147,10 @@ export function createFixtureName<Schema extends ParsableSchema>(
         entries += ": ";
         entries += createFixtureName(schema.entries[name]);
         entries += ", ";
+      }
+
+      if (Object.keys(schema.entries).length > 0) {
+        entries = entries.slice(0, -2);
       }
 
       entries += "}";
