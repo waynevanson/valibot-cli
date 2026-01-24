@@ -1,11 +1,8 @@
 import * as v from "valibot";
 import { describe, expect, test } from "vitest";
 import * as c from "../src/index.js";
+import { isArgMethod } from "../src/methods/arg-method.js";
 import type { ParsableSchema } from "../src/parse/index.js";
-
-function fixture<Schema extends ParsableSchema>(fixture: Fixture<Schema>) {
-  return fixture;
-}
 
 interface Fixture<Schema extends ParsableSchema> {
   name: string;
@@ -23,10 +20,117 @@ function createFixtures<Schemas extends ReadonlyArray<ParsableSchema>>(
   return fixtures;
 }
 
+function stringify(value: unknown): string {
+  switch (typeof value) {
+    case "object": {
+      if (Array.isArray(value)) {
+        return `[${value.map((v) => stringify(v)).join(", ")}]`;
+      }
+
+      if (value !== null) {
+        let entries = "";
+        entries += "{ ";
+
+        for (const name in value) {
+          if (name === "type") {
+            continue;
+          }
+
+          entries += name;
+          entries += ": ";
+          //@ts-expect-error
+          entries += value[name];
+          entries += ", ";
+        }
+
+        entries += "}";
+
+        return entries;
+      }
+
+      return "null";
+    }
+
+    case "boolean":
+    case "number": {
+      return value.toString();
+    }
+    case "string": {
+      return `"${value}"`;
+    }
+
+    case "undefined": {
+      return "undefined";
+    }
+
+    default: {
+      throw new Error();
+    }
+  }
+}
+
+function createFixtureName<Schema extends ParsableSchema>(
+  schema: Schema,
+): string {
+  if (isArgMethod(schema)) {
+    const metadata = c.getArgMethodMetadata(schema);
+
+    const type = metadata.type;
+    //@ts-expect-error
+    delete metadata.type;
+
+    const name = createFixtureName(schema.pipe[0] as never);
+
+    return `${type}(${name}, ${stringify(metadata)})`;
+  }
+
+  switch (schema.type) {
+    case "boolean":
+    case "string":
+      return schema.type;
+
+    case "array": {
+      return `${schema.type}(${createFixtureName(schema.item as never)})`;
+    }
+
+    case "strict_tuple": {
+      return `${schema.type}([${schema.items.map((item) => createFixtureName(item)).join(", ")}])`;
+    }
+
+    case "nullable":
+    case "optional":
+    case "exact_optional": {
+      const default_ =
+        schema.default == null ? "" : `, ${stringify(schema.default)}`;
+      return `${schema.type}(${createFixtureName(schema.wrapped as never)}${default_})`;
+    }
+
+    case "object":
+    case "strict_object": {
+      let entries = "";
+      entries += "{ ";
+
+      for (const name in schema.entries) {
+        entries += name;
+        entries += ": ";
+        entries += createFixtureName(schema.entries[name]);
+        entries += ", ";
+      }
+
+      entries += "}";
+
+      return `${schema.type}(${entries})`;
+    }
+
+    default: {
+      throw new Error();
+    }
+  }
+}
+
 const fixtures = createFixtures([
   {
     name: "option(string) long shorts aliases",
-
     schema: c.option(v.string(), {
       name: "greeting",
 
@@ -402,20 +506,20 @@ describe(c.parse.name, () => {
   const fixes = fixtures.map(
     (fixture) =>
       [
-        fixture.name,
+        createFixtureName(fixture.schema),
         { schema: fixture.schema, cases: fixture.cases, only: fixture.only },
       ] as const,
   );
 
   describe.each(fixes)("%s", (_name, fixture) => {
     const cases = fixture.cases.map(
-      (case_) => [case_.argv.join(" "), case_] as const,
+      (case_) => [stringify(case_.argv), case_] as const,
     );
 
     describe.skipIf(skippable && !fixture.only).each(cases)(
       "%s",
       (_name, case_) => {
-        test(case_.expected?.toString() ?? "", () => {
+        test(stringify(case_.expected), () => {
           // parse = argv + schema
           const parsed = c.parse(fixture.schema, case_.argv);
           expect(parsed).toStrictEqual(case_.expected);

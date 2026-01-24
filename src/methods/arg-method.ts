@@ -38,7 +38,7 @@ export function isArgMethod<T extends v.GenericSchema>(
   return (
     "pipe" in schema &&
     Array.isArray(schema.pipe) &&
-    schema.pipe.length === 1 &&
+    schema.pipe.length === 2 &&
     schema.pipe[1]?.kind === "metadata" &&
     schema.pipe[1]?.type === "metadata" &&
     typeof schema.pipe[1]?.metadata === "object" &&
@@ -50,5 +50,5 @@ export function getArgMethodMetadata<
   TSchema extends v.GenericSchema,
   TArgMetadata extends ArgMetadata,
 >(schema: ArgMethod<TSchema, TArgMetadata>): TArgMetadata {
-  return schema.pipe[1].metadata[ARG_METADATA];
+  return structuredClone(schema.pipe[1].metadata[ARG_METADATA]);
 }
