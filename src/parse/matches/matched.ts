@@ -1,6 +1,6 @@
 import type { Only } from "../../utils/only.js";
 import type { ParsableSchema } from "../parse.js";
-import type { ArgsToken, OptionToken, ValueToken } from "../tokens/index.js";
+import type { ArgsToken } from "../tokens/index.js";
 import type { Unmatches, UnmatchLeaf } from "../unmatches.js";
 import { getMatchForValue } from "./match.js";
 import type { Matches } from "./matches.js";
@@ -20,56 +20,48 @@ export interface GetMatchedInputs {
 export function getMatched(token: ArgsToken, inputs: GetMatchedInputs) {
   switch (token.type) {
     case "option": {
-      return getMatchedForOption(token, inputs);
+      const unmatch = inputs.unmatches.find((leaf) =>
+        isUnmatchForOption(leaf, token),
+      );
+
+      // `--<identifier>=<value>`
+      if (token.value !== undefined) {
+        const match = getMatchForValue(unmatch, token);
+
+        inputs.matches.add(unmatch, match);
+        return;
+      }
+
+      // `--<identifier>`
+      // todo: booleans where values are optional
+      if (unmatch.type === "boolean" && unmatch.value !== "required") {
+        inputs.matches.add(unmatch, true);
+        return;
+      }
+
+      // `--identifier [value]`
+      // schema expects this to have a value.
+      // We will apply default if not found in this thing.
+      inputs.previous.set(unmatch);
+      break;
     }
 
+    // `[value]`
     case "value": {
-      return getMatchedForValue(token, inputs);
+      // TokenOption requires identifier which go on previous token.
+      const unmatch =
+        inputs.previous.get() ??
+        inputs.unmatches.find((leaf) =>
+          isUnmatchForValue(leaf, inputs.matches),
+        );
+
+      const match = getMatchForValue(unmatch, token);
+
+      inputs.matches.add(unmatch, match);
+      break;
     }
 
     default:
       throw new Error();
   }
-}
-
-export function getMatchedForOption(
-  token: OptionToken,
-  inputs: GetMatchedInputs,
-) {
-  const unmatch = inputs.unmatches.find((leaf) =>
-    isUnmatchForOption(leaf, token),
-  );
-
-  // `--<identifier>=<value>`
-  if (token.value !== undefined) {
-    const match = getMatchForValue(unmatch, token);
-
-    inputs.matches.add(unmatch, match);
-    return;
-  }
-
-  // `--<identifier>`
-  // todo: booleans where values are optional
-  if (unmatch.type === "boolean" && unmatch.value !== "required") {
-    inputs.matches.add(unmatch, true);
-    return;
-  }
-
-  // schema expects this to have a value
-  // `--identifier [value]`
-  inputs.previous.set(unmatch);
-}
-
-export function getMatchedForValue(
-  token: ValueToken,
-  inputs: GetMatchedInputs,
-) {
-  // TokenOption requires identifier which go on previous token.
-  const unmatch =
-    inputs.previous.get() ??
-    inputs.unmatches.find((leaf) => isUnmatchForValue(leaf, inputs.matches));
-
-  const match = getMatchForValue(unmatch, token);
-
-  inputs.matches.add(unmatch, match);
 }
