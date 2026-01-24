@@ -17,10 +17,7 @@ export interface GetMatchedInputs {
 }
 
 // get the value from the token and coerce it to a datatype
-export function getMatched(
-  token: ArgsToken,
-  inputs: GetMatchedInputs,
-): Matched {
+export function getMatched(token: ArgsToken, inputs: GetMatchedInputs) {
   switch (token.type) {
     case "option": {
       return getMatchedForOption(token, inputs);
@@ -38,7 +35,7 @@ export function getMatched(
 export function getMatchedForOption(
   token: OptionToken,
   inputs: GetMatchedInputs,
-): Matched {
+) {
   const unmatch = inputs.unmatches.find((leaf) =>
     isUnmatchForOption(leaf, token),
   );
@@ -47,35 +44,26 @@ export function getMatchedForOption(
   if (token.value !== undefined) {
     const match = getMatchForValue(unmatch, token);
 
-    return {
-      type: "matched",
-      unmatch,
-      match,
-    };
+    inputs.matches.add(unmatch, match);
+    return;
   }
 
   // `--<identifier>`
   // todo: booleans where values are optional
   if (unmatch.type === "boolean" && unmatch.value !== "required") {
-    return {
-      type: "matched",
-      unmatch,
-      match: true,
-    };
+    inputs.matches.add(unmatch, true);
+    return;
   }
 
   // schema expects this to have a value
   // `--identifier [value]`
-  return {
-    type: "previous",
-    unmatch,
-  };
+  inputs.previous.set(unmatch);
 }
 
 export function getMatchedForValue(
   token: ValueToken,
   inputs: GetMatchedInputs,
-): Matched {
+) {
   // TokenOption requires identifier which go on previous token.
   const unmatch =
     inputs.previous.get() ??
@@ -83,9 +71,5 @@ export function getMatchedForValue(
 
   const match = getMatchForValue(unmatch, token);
 
-  return {
-    type: "matched",
-    match,
-    unmatch,
-  };
+  inputs.matches.add(unmatch, match);
 }

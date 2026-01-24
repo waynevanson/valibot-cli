@@ -20,23 +20,7 @@ export function collectMatches(
   };
 
   for (const token of tokens) {
-    const matched = getMatched(token, inputs);
-
-    switch (matched.type) {
-      case "previous": {
-        previous.set(matched.unmatch);
-        break;
-      }
-
-      case "matched": {
-        matches.add(matched.unmatch, matched.match);
-        break;
-      }
-
-      default: {
-        throw new Error();
-      }
-    }
+    getMatched(token, inputs);
   }
 
   // resolve the flag as a boolean if we had one
