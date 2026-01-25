@@ -4,6 +4,7 @@ import {
   createArgTokens,
   type OptionShortToken,
   type OptionsShortValueToken,
+  type ValueToken,
 } from "./arg.js";
 
 describe(createArgTokens, () => {
@@ -25,11 +26,11 @@ describe(createArgTokens, () => {
     expect(argTokens).toStrictEqual(expected);
   });
 
-  const value = fc
+  const optionValue = fc
     .string({ minLength: 1 })
     .filter((string) => !string.includes(" "));
 
-  test.prop([chars, value], { verbose: true })(
+  test.prop([chars, optionValue], { verbose: true })(
     "OptionShortValueToken",
     (chars, value) => {
       const arg = `-${chars}=${value}`;
@@ -61,4 +62,14 @@ describe(createArgTokens, () => {
       expect(optionShortValueToken).toStrictEqual(last);
     },
   );
+
+  const value = fc
+    .string({ minLength: 1 })
+    .filter((string) => /^[^(--)][^\s=]+$/.test(string));
+
+  test.prop([value])("ValueToken", (value) => {
+    const argTokens = createArgTokens(value);
+    const expected: ValueToken = { type: "value", value };
+    expect(argTokens).toStrictEqual([expected]);
+  });
 });
