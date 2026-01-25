@@ -63,7 +63,7 @@ const longs = v.pipe(
   v.transform(tuple),
 );
 
-const SHORT_FLAG_REGEXP = /(?<short>-(?<identifiers>[^=]+)(=(?<value>.+))?)/;
+const SHORT_FLAG_REGEXP = /(?<short>-(?<identifiers>[^=\s-]+)(=(?<value>.+))?)/;
 
 const shorts = v.pipe(
   objectWithoutRestUndefined({
