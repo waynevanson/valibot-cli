@@ -8,6 +8,15 @@ import {
   stringify,
 } from "../src/utils/fixtures.js";
 
+describe("parser", () => {
+  test("should fail", () => {
+    const schema = c.option(v.string(), { name: "sup", longs: ["sd"] });
+    const argv: ReadonlyArray<string> = [];
+    const parse = () => c.parse(schema, argv);
+    expect(parse).toThrowError();
+  });
+});
+
 // todo: error cases
 const fixturesByExpected = createFixturesByExpected([
   {
