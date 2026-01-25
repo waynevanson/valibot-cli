@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { ExpectedError } from "../../utils/error.js";
 import { objectWithoutRestUndefined, tuple } from "../../utils/index.js";
 
 export type ArgToken = OptionToken | PrevaluesToken | ValueToken;
@@ -84,14 +85,19 @@ const shorts = v.pipe(
       }),
     );
 
-    if (identifiers.length > 0) {
-      tokens.push({
-        identifier: identifiers[identifiers.length - 1],
-        short: true,
-        type: "option",
-        value: input.value,
-      });
+    /* v8 ignore if -- @preserve */
+    if (identifiers.length === 0) {
+      throw new ExpectedError(
+        `Expected identifiers to contain at least 1 identifier`,
+      );
     }
+
+    tokens.push({
+      identifier: identifiers[identifiers.length - 1],
+      short: true,
+      type: "option",
+      value: input.value,
+    });
 
     return tokens;
   }),
@@ -126,12 +132,14 @@ const all = v.union([longs, shorts, prevalues, value]);
 export function createArgTokens(arg: string) {
   const matches = ALL_REGEXP.exec(arg);
 
+  /* v8 ignore if -- @preserve */
   if (matches === null) {
-    throw new Error("Expected matches of an arg to be non-nullable");
+    throw new ExpectedError("Expected matches of an arg to be non-nullable");
   }
 
+  /* v8 ignore if -- @preserve */
   if (matches.groups === undefined) {
-    throw new Error("Expected groups to be defined");
+    throw new ExpectedError("Expected groups to be defined");
   }
 
   return v.parse(all, matches.groups);

@@ -2,8 +2,10 @@ import { fc, test } from "@fast-check/vitest";
 import { describe, expect } from "vitest";
 import {
   createArgTokens,
+  type OptionLongToken,
   type OptionShortToken,
   type OptionsShortValueToken,
+  type PrevaluesToken,
   type ValueToken,
 } from "./arg.js";
 
@@ -71,5 +73,29 @@ describe(createArgTokens, () => {
     const argTokens = createArgTokens(value);
     const expected: ValueToken = { type: "value", value };
     expect(argTokens).toStrictEqual([expected]);
+  });
+
+  const longIdentifier = fc
+    .string({ minLength: 1 })
+    .filter((string) => /^(?!<(--))[^\s=]+$/.test(string));
+
+  test.prop([longIdentifier])("OptionLongToken", (identifier) => {
+    const argTokens = createArgTokens(`--${identifier}`);
+    expect(argTokens).toStrictEqual([
+      {
+        type: "option",
+        short: false,
+        identifier,
+        value: undefined,
+      } satisfies OptionLongToken,
+    ]);
+  });
+
+  test("PrevaluesToken", () => {
+    const argTokens = createArgTokens(`--`);
+
+    expect(argTokens).toStrictEqual([
+      { type: "prevalues" } satisfies PrevaluesToken,
+    ]);
   });
 });
