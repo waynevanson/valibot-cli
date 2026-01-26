@@ -1,6 +1,7 @@
 import { createArgTokens, type OptionToken, type ValueToken } from "./arg.js";
 
 export type ArgsToken = OptionToken | ValueToken;
+export type ArgsTokens = IterableIterator<ArgsToken>;
 
 export class Trailing {
   private trailing: 0 | 1 | 2 = 0;
@@ -19,36 +20,33 @@ export class Trailing {
     return this.trailing === 1;
   }
 }
+export function* createArgsTokens(
+  args: ReadonlyArray<string>,
+): IterableIterator<ArgsToken> {
+  const trailing = new Trailing();
 
-export class ArgsTokens implements Iterable<ArgsToken> {
-  constructor(private args: ReadonlyArray<string>) {}
+  for (const arg of args) {
+    if (trailing.isTrailing()) {
+      yield { type: "value", value: arg };
+      trailing.push();
+    }
 
-  *[Symbol.iterator](): Iterator<ArgsToken> {
-    const trailing = new Trailing();
+    for (const argToken of createArgTokens(arg)) {
+      switch (argToken.type) {
+        case "prevalues": {
+          trailing.push();
+          break;
+        }
 
-    for (const arg of this.args) {
-      if (trailing.isTrailing()) {
-        yield { type: "value", value: arg };
-        trailing.push();
-      }
-
-      for (const argToken of createArgTokens(arg)) {
-        switch (argToken.type) {
-          case "prevalues": {
-            trailing.push();
-            break;
-          }
-
-          default: {
-            yield argToken;
-            break;
-          }
+        default: {
+          yield argToken;
+          break;
         }
       }
     }
+  }
 
-    if (trailing.isTrailingRequired()) {
-      throw new Error("Expected to emit value arg after providing `--`");
-    }
+  if (trailing.isTrailingRequired()) {
+    throw new Error("Expected to emit value arg after providing `--`");
   }
 }

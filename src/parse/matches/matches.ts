@@ -1,6 +1,6 @@
 import { Only } from "../../utils/only.js";
 import type { ParsableSchema } from "../parse.js";
-import type { ArgsTokens } from "../tokens/args.js";
+import type { ArgsTokens } from "../tokens/index.js";
 import type { Unmatches, UnmatchLeaf } from "../unmatches.js";
 import { type GetMatchedInputs, getMatched } from "./matched.js";
 
