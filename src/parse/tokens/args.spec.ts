@@ -19,14 +19,14 @@ describe(createArgsTokens, () => {
     const args = charargs.map((chars) => `-${chars}`);
     const argTokens = Array.from(createArgsTokens(args));
 
-    const expected = charargs.flatMap((a) =>
-      a.split("").map((char) => ({
+    const expected = charargs
+      .flatMap((a) => a.split(""))
+      .map((char) => ({
         identifier: char,
         short: true,
         type: "option",
         value: undefined,
-      })),
-    );
+      }));
 
     expect(argTokens).toStrictEqual(expected);
   });
