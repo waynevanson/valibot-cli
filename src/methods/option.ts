@@ -2,26 +2,20 @@ import * as v from "valibot";
 import type { ArgOptionMetadata } from "./arg-metadata.js";
 import { type ArgMethod, arg } from "./arg-method.js";
 
-export type OptionSchema =
+export type OptionValueSchema =
   | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
-  | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>
-  | v.ArraySchema<
-      | v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>
-      | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
-      v.ErrorMessage<v.ArrayIssue> | undefined
-    >
-  | v.ExactOptionalSchema<
-      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
-      string | undefined
-    >
-  | v.OptionalSchema<
-      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
-      string | undefined
-    >
-  | v.NullableSchema<
-      v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
-      string | null | undefined
-    >;
+  | v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>;
+
+// todo: nullish
+export type OptionBoxSchema<Schema extends OptionValueSchema> =
+  | v.ArraySchema<Schema, v.ErrorMessage<v.ArrayIssue> | undefined>
+  | v.ExactOptionalSchema<Schema, v.Default<Schema, never>>
+  | v.OptionalSchema<Schema, v.Default<Schema, never>>
+  | v.NullableSchema<Schema, v.Default<Schema, never>>;
+
+export type OptionSchema =
+  | OptionValueSchema
+  | OptionBoxSchema<OptionValueSchema>;
 
 export type OptionParsable<Schema extends OptionSchema = OptionSchema> =
   ArgMethod<Schema, ArgOptionMetadata>;
