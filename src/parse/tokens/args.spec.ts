@@ -93,4 +93,17 @@ describe(createArgsTokens, () => {
       } satisfies OptionLongToken,
     ]);
   });
+
+  const trailingvalue = fc.string({ minLength: 1 });
+  const trailingvalues = fc.array(trailingvalue, { minLength: 1 });
+
+  test.prop([trailingvalues])("only values after --", (trailingvalues) => {
+    const argTokens = Array.from(
+      createArgsTokens(trailingvalues.toSpliced(0, 0, `--`)),
+    );
+    const expected = trailingvalues.map(
+      (value): ValueToken => ({ type: "value", value }),
+    );
+    expect(argTokens).toStrictEqual(expected);
+  });
 });

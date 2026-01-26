@@ -29,6 +29,7 @@ export function* createArgsTokens(
     if (trailing.isTrailing()) {
       yield { type: "value", value: arg };
       trailing.push();
+      continue;
     }
 
     for (const argToken of createArgTokens(arg)) {
