@@ -20,6 +20,7 @@ export class Trailing {
     return this.trailing === 1;
   }
 }
+
 export function* createArgsTokens(
   args: ReadonlyArray<string>,
 ): IterableIterator<ArgsToken> {
