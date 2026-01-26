@@ -13,16 +13,20 @@ describe(createArgsTokens, () => {
     .string({ minLength: 1 })
     .filter((string) => /^[^\s-=]+$/.test(string));
 
-  test.prop([chars])("OptionShortToken", (chars) => {
-    const arg = `-${chars}`;
-    const argTokens = Array.from(createArgsTokens([arg]));
+  const charargs = fc.array(chars, { minLength: 1 });
 
-    const expected = chars.split("").map((char) => ({
-      identifier: char,
-      short: true,
-      type: "option",
-      value: undefined,
-    }));
+  test.prop([charargs])("OptionShortToken", (charargs) => {
+    const args = charargs.map((chars) => `-${chars}`);
+    const argTokens = Array.from(createArgsTokens(args));
+
+    const expected = charargs.flatMap((a) =>
+      a.split("").map((char) => ({
+        identifier: char,
+        short: true,
+        type: "option",
+        value: undefined,
+      })),
+    );
 
     expect(argTokens).toStrictEqual(expected);
   });
