@@ -5,6 +5,7 @@ import type {
   ArgParsable,
   ArgSchema,
   ArgValueMetadata,
+  OptionParsable,
 } from "../methods/index.js";
 import type { MaybeReadonly } from "../utils/index.js";
 import { build } from "./build.js";
@@ -16,14 +17,10 @@ import { Unmatches } from "./unmatches.js";
 export type ParsableLeaf<Schema extends ArgSchema> = ArgParsable<Schema>;
 
 export type ParsableSchemaPrimitive =
+  | OptionParsable
   | ArgMethod<
       v.StringSchema<v.ErrorMessage<v.StringIssue> | undefined>,
-      ArgOptionMetadata | ArgValueMetadata
-    >
-  | ArgMethod<
-      v.BooleanSchema<v.ErrorMessage<v.BooleanIssue> | undefined>,
-      // todo: ArgValueMetadata
-      ArgOptionMetadata
+      ArgValueMetadata
     >;
 
 export type ParsableSchema =
